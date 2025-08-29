@@ -1,5 +1,3 @@
-"use strict";
-exports.__esModule = true;
 var CHAR_RANGE = [
     '0', '1', '2', '3', '4', '5', '6', '7', '8',
     '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
@@ -9,9 +7,11 @@ var CHAR_RANGE = [
     'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
     'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
 ];
+
 function randomChar() {
     return CHAR_RANGE[Math.floor(Math.random() * CHAR_RANGE.length)];
 }
+
 function generatePath(existingPaths, pathLength) {
     if (pathLength === void 0) { pathLength = 7; }
     var path;
@@ -26,5 +26,5 @@ function generatePath(existingPaths, pathLength) {
     }
     return path;
 }
-console.log(generatePath([]));
-exports["default"] = generatePath;
+
+module.exports = generatePath

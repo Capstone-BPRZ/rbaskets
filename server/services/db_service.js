@@ -1,5 +1,5 @@
 const { Client } = require('pg')
-const generatePath = require('path_generator')
+const generatePath = require('./path_generator.js')
 
 require('dotenv').config({path: '../.env'})
 
@@ -26,22 +26,20 @@ async function createBasket(userId) {
   try {
     client = await connect()
     await client.query('BEGIN')
+
     const getPathsStatement = "SELECT basket_path FROM baskets"
     let allPaths = await client.query(getPathsStatement)
-
     allPaths = allPaths.rows.map(el => el.basket_path);
+    const basketPath = generatePath(allPaths);
 
+    const insertStatement = "INSERT INTO baskets (user_id, basket_path) VALUES ($1, $2)"
+    await client.query(insertStatement, [userId, basketPath]);
+    await client.query('COMMIT');
 
+    const getNewBasketStatement = "SELECT * FROM baskets WHERE basket_path = $1"
+    let newBasket = await client.query(getNewBasketStatement, [basketPath])
 
-    // get list of existing basket paths to guarantee uniqueness
-    // generate random value and check that it isn't an existing path
-
-    // const insertStatement = "INSERT INTO baskets (user_id, basket_path) VALUES ($1, $2)"
-    // const returnA = await client.query(insertStatement, [userId, basketPath]);
-    // const returnB = await client.query('COMMIT')
-    // console.log('return value of insert: ', returnA)
-    // console.log('return value of commit: ', returnB)
-    // need to return id of the created basket and potentially other data about it
+    return newBasket.rows[0]
   } catch (err) {
     await client.query('ROLLBACK')
     console.error(err)
