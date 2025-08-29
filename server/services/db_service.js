@@ -1,4 +1,6 @@
 const { Client } = require('pg')
+const generatePath = require('path_generator')
+
 require('dotenv').config({path: '../.env'})
 
 async function connect() {
@@ -19,6 +21,37 @@ async function connect() {
   }
 }
 
+async function createBasket(userId) {
+  let client;
+  try {
+    client = await connect()
+    await client.query('BEGIN')
+    const getPathsStatement = "SELECT basket_path FROM baskets"
+    let allPaths = await client.query(getPathsStatement)
+
+    allPaths = allPaths.rows.map(el => el.basket_path);
+
+
+
+    // get list of existing basket paths to guarantee uniqueness
+    // generate random value and check that it isn't an existing path
+
+    // const insertStatement = "INSERT INTO baskets (user_id, basket_path) VALUES ($1, $2)"
+    // const returnA = await client.query(insertStatement, [userId, basketPath]);
+    // const returnB = await client.query('COMMIT')
+    // console.log('return value of insert: ', returnA)
+    // console.log('return value of commit: ', returnB)
+    // need to return id of the created basket and potentially other data about it
+  } catch (err) {
+    await client.query('ROLLBACK')
+    console.error(err)
+  } finally {
+    if (client) {
+      await client.end()
+    }
+  }
+}
+
 async function selectAllRequests(basketId) {
   let client;
   try {
@@ -35,6 +68,8 @@ async function selectAllRequests(basketId) {
   }
 }
 
-module.exports = { selectAllRequests }
+createBasket(1).then(console.log)
+
+module.exports = { selectAllRequests, createBasket }
 
 
