@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS requests (
 INSERT INTO users (id) VALUES (1);
 
 INSERT INTO baskets (user_id, basket_path) VALUES
-(1, 'abcdefg'), (2, '1234567');
+(1, 'abcdefg'), (1, '1234567');
 
 INSERT INTO requests (basket_id, received, method, headers, body_id) VALUES
 (1, now(), 'GET', 'some headers 1', 'body id 1'),

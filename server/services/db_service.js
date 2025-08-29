@@ -1,4 +1,6 @@
 const { Client } = require('pg')
+const generatePath = require('./path_generator.js')
+
 require('dotenv').config({path: '../.env'})
 
 async function connect() {
@@ -19,6 +21,35 @@ async function connect() {
   }
 }
 
+async function createBasket(userId) {
+  let client;
+  try {
+    client = await connect()
+    await client.query('BEGIN')
+
+    const getPathsStatement = "SELECT basket_path FROM baskets"
+    let allPaths = await client.query(getPathsStatement)
+    allPaths = allPaths.rows.map(el => el.basket_path);
+    const basketPath = generatePath(allPaths);
+
+    const insertStatement = "INSERT INTO baskets (user_id, basket_path) VALUES ($1, $2)"
+    await client.query(insertStatement, [userId, basketPath]);
+    await client.query('COMMIT');
+
+    const getNewBasketStatement = "SELECT * FROM baskets WHERE basket_path = $1"
+    let newBasket = await client.query(getNewBasketStatement, [basketPath])
+
+    return newBasket.rows[0]
+  } catch (err) {
+    await client.query('ROLLBACK')
+    console.error(err)
+  } finally {
+    if (client) {
+      await client.end()
+    }
+  }
+}
+
 async function selectAllRequests(basketId) {
   let client;
   try {
@@ -35,6 +66,8 @@ async function selectAllRequests(basketId) {
   }
 }
 
-module.exports = { selectAllRequests }
+createBasket(1).then(console.log)
+
+module.exports = { selectAllRequests, createBasket }
 
 
