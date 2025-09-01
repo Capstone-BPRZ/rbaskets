@@ -39,7 +39,7 @@ app.use(express.json());
 */
 
 
-app.post('/api/baskets/create', async (/*req: Request,*/ res: Response) => {
+app.post('/api/baskets/create', async (_req: Request, res: Response) => {
   try {
     const newBasket: BasketData | null = await createBasket(userId); 
 
