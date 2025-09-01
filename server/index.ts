@@ -32,13 +32,14 @@ app.use(express.json());
       }
     });
     
+    /*
     app.get('/api/baskets/:basket/requests/:request', (req: Request, res: Response) => {
    
     });
+*/
 
 
-
-app.post('/api/baskets/create', async (req: Request, res: Response) => {
+app.post('/api/baskets/create', async (/*req: Request,*/ res: Response) => {
   try {
     const newBasket: BasketData | null = await createBasket(userId); 
 
@@ -62,19 +63,21 @@ app.post('/api/baskets/create', async (req: Request, res: Response) => {
       err: err.message || 'Internal server error.'
     });
     }
-   
+   return res.status(500).json({
+    err: 'Unknown error occurred.'
+   });
   }
 
 });
 
 
 
-
+/*
 app.delete('/api/baskets/basket_id', (req: Request, res: Response) => {
 
 
 });
-
+*/
 
 app.listen(PORT, () => {
      console.log(`Server is running on port ${PORT}`);
