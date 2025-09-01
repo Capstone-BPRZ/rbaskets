@@ -1,22 +1,25 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
-import { selectAllRequests } from './services/db_service';
- import { RequestData } from './types';
+import { selectAllRequests, createBasket } from './services/db_service';
+ import { RequestData, BasketData } from './types';
 
 dotenv.config();
 
 const app = express();
+const userId = 1; 
 const PORT = process.env.PORT || 3000;
 
  
+
 app.use(express.json());
+
 
 
 
  app.get('/api/baskets/:basket/requests', async (req: Request, res: Response) => {
       try {
          const basketId = req.params.basket;
-         const requests: RequestData[] = await selectAllRequests(basketId);
+         const requests: RequestData[] | null = await selectAllRequests(basketId);
        
          res.status(200).json({
            requests: requests
@@ -30,13 +33,37 @@ app.use(express.json());
     });
     
     app.get('/api/baskets/:basket/requests/:request', (req: Request, res: Response) => {
-      // Your implementation here
+   
     });
 
 
 
-app.post('/api/baskets/create', (req: Request, res: Response) => {
+app.post('/api/baskets/create', async (req: Request, res: Response) => {
+  try {
+    const newBasket: BasketData | null = await createBasket(userId); 
 
+    if (!userId) {
+      return res.status(400).json({error: "Missing userId"});
+    }
+
+    if (!newBasket) {
+      return res.status(404).json({error: 'Basket failed to be Constructed.'});
+    }
+
+    const {id, basket_path, user_id} = newBasket; 
+
+    const responseData: BasketData = {id, basket_path, user_id};
+
+    return res.status(200).json(responseData); 
+  } catch (err) {
+    if (err instanceof Error) {
+      console.log('Error creating basker:', err);
+       return res.status(500).json({
+      err: err.message || 'Internal server error.'
+    });
+    }
+   
+  }
 
 });
 
