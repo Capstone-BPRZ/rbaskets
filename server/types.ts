@@ -6,3 +6,15 @@ export interface RequestData {
     body: string
 }
 
+
+export interface BasketData {
+    id: number; 
+    basket_path: string; 
+    user_id: number; 
+}
+
+export type user_id = number; 
+
+
+
+
