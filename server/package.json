@@ -18,6 +18,8 @@
     "@stylistic/eslint-plugin": "^5.2.3",
     "@types/eslint__js": "^8.42.3",
     "@types/express": "^5.0.3",
+    "@types/mongodb": "^4.0.6",
+    "@types/pg": "^8.15.5",
     "eslint": "^9.34.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.2",
@@ -25,6 +27,8 @@
   },
   "dependencies": {
     "dotenv": "^17.2.1",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "mongodb": "^6.19.0",
+    "pg": "^8.16.3"
   }
 }

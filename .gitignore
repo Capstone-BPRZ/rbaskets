@@ -1,3 +1,4 @@
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -12,3 +13,7 @@
 *.iml
 out
 gen
+
+/node_modules
+.env
+
