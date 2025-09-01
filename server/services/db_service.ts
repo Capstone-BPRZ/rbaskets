@@ -4,7 +4,10 @@ import type { user_id, RequestDB, RequestData, BasketData, } from "../types.js";
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 
-dotenv.config({ path: '../.env' });
+dotenv.config({ path: `${__dirname}/../.env` });
+
+console.log('db user: ', process.env.DB_USER)
+console.log('mongo uri: ', process.env.MONGODB_URI)
 
 mongoose.set('strictQuery', false)
 
@@ -68,7 +71,7 @@ async function selectAllRequests(basketId: string): Promise<RequestData[] | null
   let client;
   try {
     client = await connectSQL();
-    const selectQuery = "SELECT id, received, method, headers, body FROM requests WHERE basket_id = $1";
+    const selectQuery = "SELECT id, received, method, headers, body, basket_id FROM requests WHERE basket_id = $1";
     const result = await client.query<RequestData>(selectQuery, [basketId]);
     return result.rows;
   } catch (err) {
@@ -110,6 +113,7 @@ async function addRequestToBasket(basketId: string, timestamp: Date, method: str
 
     const fullRequest: RequestData = {
       id: pgRequest.id,
+      basket_id: pgRequest.basket_id,
       received: pgRequest.received,
       method: pgRequest.method,
       headers: pgRequest.headers,

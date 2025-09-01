@@ -3,6 +3,7 @@ interface Request {
     received: Date;
     method: string;
     headers: string;
+    basket_id: number;
 }
 
 export interface RequestDB extends Request {
