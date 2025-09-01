@@ -1,14 +1,23 @@
 import { Client } from 'pg';
 import generatePath from './path_generator';
-import type { user_id, RequestData, BasketData, } from "../types.js";
+import type { user_id, RequestDB, RequestData, BasketData, } from "../types.js";
 import dotenv from 'dotenv';
+import mongoose from 'mongoose';
 
-dotenv.config({ path: '../.env' });
+dotenv.config({ path: `${__dirname}/../.env` });
 
+console.log('db user: ', process.env.DB_USER)
+console.log('mongo uri: ', process.env.MONGODB_URI)
 
+mongoose.set('strictQuery', false)
 
+const requestBodySchema = new mongoose.Schema({
+  body: String,
+})
 
-async function connect() {
+const RequestBody = mongoose.model('RequestBody', requestBodySchema)
+
+async function connectSQL() {
   try {
     const client = new Client({
       user: process.env.DB_USER,
@@ -29,7 +38,7 @@ async function connect() {
 async function createBasket(userId: user_id): Promise<BasketData | null> {
   let client;
   try {
-    client = await connect();
+    client = await connectSQL();
     await client.query('BEGIN');
 
     const getPathsStatement = "SELECT basket_path FROM baskets";
@@ -61,8 +70,8 @@ async function createBasket(userId: user_id): Promise<BasketData | null> {
 async function selectAllRequests(basketId: string): Promise<RequestData[] | null> {
   let client;
   try {
-    client = await connect();
-    const selectQuery = "SELECT id, received, method, headers, body FROM requests WHERE basket_id = $1";
+    client = await connectSQL();
+    const selectQuery = "SELECT id, received, method, headers, body, basket_id FROM requests WHERE basket_id = $1";
     const result = await client.query<RequestData>(selectQuery, [basketId]);
     return result.rows;
   } catch (err) {
@@ -75,8 +84,56 @@ async function selectAllRequests(basketId: string): Promise<RequestData[] | null
   }
 }
 
- createBasket(1).then(console.log); 
+async function addRequestToBasket(basketId: string, timestamp: Date, method: string, headers: string, body: string): Promise<RequestData | null> {
+  let pgClient;
+  try {
+    await mongoose.connect(process.env.MONGODB_URI as string)
 
-export { selectAllRequests, createBasket };
+    const reqBody = new RequestBody({
+      body: body || "",
+    })
+
+    const mongoResult = await reqBody.save()
+    const mongoBody = String(mongoResult.body)
+    const mongoId = String(mongoResult.id)
+
+    mongoose.connection.close()
+
+    pgClient = await connectSQL()
+
+    await pgClient.query('BEGIN')
+
+    const insertStatement = "INSERT INTO requests (basket_id, received, method, headers, body_id) VALUES ($1, $2, $3, $4, $5)"
+    await pgClient.query(insertStatement, [basketId, timestamp, method, headers, mongoId]);
+    await pgClient.query('COMMIT');
+
+    const getNewRequestStatement = "SELECT * FROM requests WHERE body_id = $1"
+    const newRequestResult = await pgClient.query<RequestDB>(getNewRequestStatement, [mongoId])
+    const pgRequest = newRequestResult.rows[0]
+
+    const fullRequest: RequestData = {
+      id: pgRequest.id,
+      basket_id: pgRequest.basket_id,
+      received: pgRequest.received,
+      method: pgRequest.method,
+      headers: pgRequest.headers,
+      body: mongoBody,
+    }
+
+    return fullRequest;
+  } catch (err) {
+    if (pgClient) {
+      await pgClient.query('ROLLBACK')
+    }
+    console.error(err)
+    return null;
+  } finally {
+    if (pgClient) {
+      await pgClient.end()
+    }
+  }
+}
+
+export { selectAllRequests, createBasket, addRequestToBasket };
 
 
