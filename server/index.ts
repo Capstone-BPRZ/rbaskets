@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
-import { selectAllRequests, createBasket, addRequestToBasket } from './services/db_service';
+import { selectRequest, selectAllRequests, createBasket, addRequestToBasket } from './services/db_service';
  import { RequestData, BasketData } from './types';
 
 dotenv.config();
@@ -56,16 +56,37 @@ app.all('/api/baskets/:basketId/makeRequest', async (req: Request, res: Response
        } catch (error) {
         if (error instanceof Error) {
           console.error(error);
-          res.status(404).json({ error: error.message || 'Basket not found' });
+          res.status(500).json({ error: error.message || 'Basket not found' });
         }
       }
     });
+
+
     
-    /*
-    app.get('/api/baskets/:basket/requests/:request', (req: Request, res: Response) => {
-   
+    app.get('/api/baskets/:basket/requests/:request',  async (req: Request, res: Response) => {
+      try {
+        const requestId = req.params.request;
+
+        if (!requestId) {
+          return res.status(400).json({error: "missing requestId"});
+        }
+         const request:RequestData | null = await selectRequest(requestId);
+         
+        if (!request) {
+          return res.status(404).json({error: 'Missing Request'});
+        }
+       return  res.status(200).json({
+          request: request
+        });
+      } catch(err) {
+        if (err instanceof Error) {
+          console.log(err); 
+          return res.status(500).json({err: err.message || 'Request not found'});
+        } 
+        return res.status(500).json({err: 'Unknown error.'});
+      }
     });
-*/
+
 
 
 app.post('/api/baskets/create', async (_req: Request, res: Response) => {
