@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-app.all('/api/baskets/:basketId/request', async (req: Request, res: Response) => { // decided to add the basketId to the route as the requests coming in only pertain to a particular route. 
+app.all('/api/baskets/:basketId/makeRequest', async (req: Request, res: Response) => { // decided to add the basketId to the route as the requests coming in only pertain to a particular route. 
   try {
     const { basketId } = req.params;
 
