@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
-import { selectAllRequests, createBasket } from './services/db_service';
+import { selectAllRequests, createBasket, addRequestToBasket } from './services/db_service';
  import { RequestData, BasketData } from './types';
 
 dotenv.config();
@@ -13,6 +13,35 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
+app.all('/api/baskets/:basketId/request', async (req: Request, res: Response) => { // decided to add the basketId to the route as the requests coming in only pertain to a particular route. 
+  try {
+    const { basketId } = req.params;
+
+    if (!basketId) {
+      return res.status(404).json({ error: 'Missing BasketId for the request.' });
+    }
+
+    const requestData: RequestData | null = await addRequestToBasket(
+      basketId,
+      new Date(),
+      req.method,
+      JSON.stringify(req.headers),
+      JSON.stringify(req.body)
+    );
+
+    if (!requestData) {
+      return res.status(404).json({ error: 'Request Data failed to be captured' });
+    }
+
+    return res.status(200).json({ data: requestData });
+  } catch (err) {
+    if (err instanceof Error) {
+      console.error(err);
+      return res.status(500).json({ err: err.message });
+    }
+    return res.status(500).json({ error: 'Unknown error.' });
+  }
+});
 
 
 

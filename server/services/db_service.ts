@@ -6,14 +6,14 @@ import mongoose from 'mongoose';
 
 dotenv.config({ path: `${__dirname}/../.env` });
 
-console.log('db user: ', process.env.DB_USER)
-console.log('mongo uri: ', process.env.MONGODB_URI)
+console.log('db user: ', process.env.DB_USER);
+console.log('mongo uri: ', process.env.MONGODB_URI);
 
 mongoose.set('strictQuery', false)
 
 const requestBodySchema = new mongoose.Schema({
   body: String,
-})
+});
 
 const RequestBody = mongoose.model('RequestBody', requestBodySchema)
 
@@ -71,7 +71,7 @@ async function selectAllRequests(basketId: string): Promise<RequestData[] | null
   let client;
   try {
     client = await connectSQL();
-    const selectQuery = "SELECT id, received, method, headers, body, basket_id FROM requests WHERE basket_id = $1";
+    const selectQuery = "SELECT id, received, method, headers, body_id, basket_id FROM requests WHERE basket_id = $1";
     const result = await client.query<RequestData>(selectQuery, [basketId]);
     return result.rows;
   } catch (err) {
@@ -95,21 +95,21 @@ async function addRequestToBasket(basketId: string, timestamp: Date, method: str
 
     const mongoResult = await reqBody.save()
     const mongoBody = String(mongoResult.body)
-    const mongoId = String(mongoResult.id)
+    const mongoId = String(mongoResult.id);
 
-    mongoose.connection.close()
+    mongoose.connection.close();
 
-    pgClient = await connectSQL()
+    pgClient = await connectSQL();
 
-    await pgClient.query('BEGIN')
+    await pgClient.query('BEGIN');
 
-    const insertStatement = "INSERT INTO requests (basket_id, received, method, headers, body_id) VALUES ($1, $2, $3, $4, $5)"
+    const insertStatement = "INSERT INTO requests (basket_id, received, method, headers, body_id) VALUES ($1, $2, $3, $4, $5)";
     await pgClient.query(insertStatement, [basketId, timestamp, method, headers, mongoId]);
     await pgClient.query('COMMIT');
 
-    const getNewRequestStatement = "SELECT * FROM requests WHERE body_id = $1"
-    const newRequestResult = await pgClient.query<RequestDB>(getNewRequestStatement, [mongoId])
-    const pgRequest = newRequestResult.rows[0]
+    const getNewRequestStatement = "SELECT * FROM requests WHERE body_id = $1";
+    const newRequestResult = await pgClient.query<RequestDB>(getNewRequestStatement, [mongoId]);
+    const pgRequest = newRequestResult.rows[0];
 
     const fullRequest: RequestData = {
       id: pgRequest.id,
@@ -118,18 +118,18 @@ async function addRequestToBasket(basketId: string, timestamp: Date, method: str
       method: pgRequest.method,
       headers: pgRequest.headers,
       body: mongoBody,
-    }
+    };
 
     return fullRequest;
   } catch (err) {
     if (pgClient) {
-      await pgClient.query('ROLLBACK')
+      await pgClient.query('ROLLBACK');
     }
-    console.error(err)
+    console.error(err);
     return null;
   } finally {
     if (pgClient) {
-      await pgClient.end()
+      await pgClient.end();
     }
   }
 }
