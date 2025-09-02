@@ -67,13 +67,29 @@ async function createBasket(userId: user_id): Promise<BasketData | null> {
   }
 }
 
-async function selectAllRequests(basketId: string): Promise<RequestData[] | null> {
+async function selectRequest(requestId: string): Promise<RequestData | null> {
   let client;
   try {
     client = await connectSQL();
-    const selectQuery = "SELECT id, received, method, headers, body_id, basket_id FROM requests WHERE basket_id = $1";
-    const result = await client.query<RequestData>(selectQuery, [basketId]);
-    return result.rows;
+    const selectQuery = "SELECT id, received, method, headers, body_id, basket_id FROM requests WHERE id = $1";
+    const queryResult = await client.query<RequestDB>(selectQuery, [requestId]);
+    const pgRequest = queryResult.rows[0];
+
+    await mongoose.connect(process.env.MONGODB_URI as string)
+
+    const mongoResult = await RequestBody.findById(pgRequest.body_id);
+    const mongoBody = mongoResult?.body || ""
+
+    const fullRequest: RequestData = {
+      id: pgRequest.id,
+      basket_id: pgRequest.basket_id,
+      received: pgRequest.received,
+      method: pgRequest.method,
+      headers: pgRequest.headers,
+      body: mongoBody,
+    };
+
+    return fullRequest;
   } catch (err) {
     console.error(err);
     return null;
@@ -81,6 +97,51 @@ async function selectAllRequests(basketId: string): Promise<RequestData[] | null
     if (client) {
       await client.end();
     }
+    await mongoose.connection.close();
+  }
+}
+
+async function selectAllRequests(basketId: string): Promise<RequestData[] | null> {
+  let client;
+  try {
+    client = await connectSQL();
+    const selectQuery = "SELECT id, received, method, headers, body_id, basket_id FROM requests WHERE basket_id = $1";
+    const result = await client.query<RequestDB>(selectQuery, [basketId]);
+    const pgRequests = result.rows;
+
+    await mongoose.connect(process.env.MONGODB_URI as string)
+
+    const mongoBodies = await Promise.allSettled(pgRequests.map(async pgRequest => {
+      return await RequestBody.findById(pgRequest.body_id)
+    }))
+
+    const resultBodies = mongoBodies.map(result => {
+      return (result.status === "fulfilled") ? result.value?.body : "";
+    })
+
+    const fullRequestList = pgRequests.map((pgRequest, idx) => {
+      const fullRequest: RequestData = {
+        id: pgRequest.id,
+        basket_id: pgRequest.basket_id,
+        received: pgRequest.received,
+        method: pgRequest.method,
+        headers: pgRequest.headers,
+        body: resultBodies[idx] ?? "",
+      };
+
+      return fullRequest;
+    })
+
+    return fullRequestList;
+
+  } catch (err) {
+    console.error(err);
+    return null;
+  } finally {
+    if (client) {
+      await client.end();
+    }
+    await mongoose.connection.close();
   }
 }
 
@@ -134,6 +195,6 @@ async function addRequestToBasket(basketId: string, timestamp: Date, method: str
   }
 }
 
-export { selectAllRequests, createBasket, addRequestToBasket };
+export { selectRequest, selectAllRequests, createBasket, addRequestToBasket };
 
 
