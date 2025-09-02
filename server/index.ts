@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
-import { selectRequest, selectAllRequests, createBasket, addRequestToBasket } from './services/db_service';
+import { selectRequest, selectAllRequests, createBasket, addRequestToBasket, deleteBasket } from './services/db_service';
  import { RequestData, BasketData } from './types';
 
 dotenv.config();
@@ -122,12 +122,31 @@ app.post('/api/baskets/create', async (_req: Request, res: Response) => {
 
 
 
-/*
-app.delete('/api/baskets/basket_id', (req: Request, res: Response) => {
 
+app.delete('/api/baskets/:basketId',async (req: Request, res: Response) => {
+   const {basketId} = req.params; 
+
+  try {
+  if (!basketId) {
+    return res.status(400).json({error: `No basket id of ${basketId}`});
+  }
+  const basketToDelete = await deleteBasket(basketId); 
+
+  if (!basketToDelete) {
+    return res.status(404).json({error: "There is no basket to delete. Please try a valid basketId"});
+  }
+
+  return res.status(204).send();
+    
+  } catch (err) {
+    if (err instanceof Error) {
+      console.log(`Error deleting basket ${basketId}`);
+      return res.status(500).json({err: err.message || "Internal server error"});
+    }
+    return res.status(500).json({err: "Unkown error occured"});
+  }
 
 });
-*/
 
 app.listen(PORT, () => {
      console.log(`Server is running on port ${PORT}`);
