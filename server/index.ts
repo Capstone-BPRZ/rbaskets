@@ -1,8 +1,8 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import { selectBasket, selectAllBaskets, selectRequest, selectAllRequests, createBasket, addRequestToBasket } from './services/db_service';
- import { RequestData, BasketData } from './types';
+import { createUser, selectBasket, selectAllBaskets, selectRequest, selectAllRequests, createBasket, addRequestToBasket } from './services/db_service';
+ import { RequestData, BasketData, UserData } from './types';
 
 
 dotenv.config();
@@ -160,7 +160,7 @@ app.post('/api/baskets/create', async (_req: Request, res: Response) => {
     return res.status(200).json(responseData);
   } catch (err) {
     if (err instanceof Error) {
-      console.log('Error creating basker:', err);
+      console.log('Error creating basket:', err);
        return res.status(500).json({
       err: err.message || 'Internal server error.'
     });
@@ -172,7 +172,29 @@ app.post('/api/baskets/create', async (_req: Request, res: Response) => {
 
 });
 
+app.post('/api/users', async (_req: Request, res: Response) => {
+  try {
+    const newUser: UserData | null = await createUser();
 
+    if (!newUser) {
+      return res.status(500).json({error: 'Couldn\'t create a new user'});
+    }
+
+    const { token } = newUser;
+
+    return res.status(200).json(token);
+  } catch (err) {
+    if (err instanceof Error) {
+      console.log('Error creating user: ', err);
+       return res.status(500).json({
+      err: err.message || 'Internal server error.'
+    });
+    }
+   return res.status(500).json({
+    err: 'Unknown error occurred.'
+   });
+  }
+});
 
 /*
 app.delete('/api/baskets/basket_id', (req: Request, res: Response) => {
