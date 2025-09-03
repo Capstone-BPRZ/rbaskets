@@ -15,8 +15,10 @@ function App() {
   // fetch all the baskets that belong to a user
   const fetchBaskets = async () => {
     try {
-      const response = await axios.get<Basket[]>(`${baseURL}/api/baskets`);
-      const baskets = response.data;
+      const response = await axios.get<Response>(`${baseURL}/api/baskets`);
+      console.log(response)
+      const baskets = response.data.baskets;  // this needs to call baskets (b/c the response has tons of stuff
+      // in it, the data is what we want but how to Type the get method?
       setBaskets(baskets);
       console.log('baskets:', baskets);
     } catch (error) {
@@ -26,7 +28,7 @@ function App() {
 
   useEffect(() => {
     fetchBaskets();
-    fetchRequests('1'); // for testing right now
+    // fetchRequests('1'); // for testing right now
   }, []);
 
   // given a basket id (an integer formatted as a string) fetch all the requests belonging to a basket
