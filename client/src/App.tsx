@@ -9,18 +9,19 @@ function App() {
   const [currentBasket, setCurrentBasket] = useState<Basket | null>(null);
   const [requests, setRequests] = useState<Request[]>([]);
 
-  useEffect(() => {
-    fetchBaskets();
-  }, []);
-
   const fetchBaskets = async () => {
     try {
-      const response = await axios.get<Basket>("/api/baskets");
+      const response = await axios.get<Basket[]>("/api/baskets");
       setBaskets(response.data);
     } catch (error) {
       console.error("Error fetching baskets:", error);
     }
-  };
+  }
+
+  useEffect(() => {
+    fetchBaskets();
+  }, []);
+
 
   const fetchBasket = async (basket) => {
     try {
@@ -31,7 +32,7 @@ function App() {
     }
   }
 
-  const deleteBasket = (basket) => {
+  const deleteBasket = async (basket: Basket) => {
     axios.delete(`/api/todos/${basket.id}`);
     fetchBaskets();
   }
@@ -46,7 +47,8 @@ function App() {
   }
 
 
-  return ()
+  return (
+  )
 }
 
 export default App;
