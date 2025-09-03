@@ -194,6 +194,41 @@ app.post('/api/baskets/create', async (_req: Request, res: Response) => {
 
 });
 
+
+app.post('/api/baskets/:user_token/create', async (req: Request, res: Response) => {
+  try {
+    const userId = await selectUser(req.params.user_token);
+
+    if (!userId) {
+      return res.status(404).json({error: 'Invalid user token'});
+    }
+
+    const newBasket: BasketData | null = await createBasket(userId);
+
+    if (!newBasket) {
+      return res.status(404).json({error: 'Basket failed to be Constructed.'});
+    }
+
+    const {id, basket_path, user_id} = newBasket;
+
+    const responseData: BasketData = {id, basket_path, user_id};
+
+    return res.status(200).json(responseData);
+  } catch (err) {
+    if (err instanceof Error) {
+      console.log('Error creating basket:', err);
+       return res.status(500).json({
+      err: err.message || 'Internal server error.'
+    });
+    }
+   return res.status(500).json({
+    err: 'Unknown error occurred.'
+   });
+  }
+
+});
+
+
 app.post('/api/users', async (_req: Request, res: Response) => {
   try {
     const newUser: UserData | null = await createUser();
