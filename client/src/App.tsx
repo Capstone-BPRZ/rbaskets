@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from "axios";
 import type {Basket, Request} from "./types";
+import MyBasketsContainer from "./components/MyBasketsContainer.tsx";
 
 
 function App() {
@@ -11,23 +12,24 @@ function App() {
 
   const baseURL = 'http://localhost:3000';
 
-
+  // fetch all the baskets that belong to a user
   const fetchBaskets = async () => {
     try {
       const response = await axios.get<Basket[]>(`${baseURL}/api/baskets`);
-      const data = response.data;
-      setBaskets(data.baskets);
-      console.log('baskets:', response.data);
+      const baskets = response.data;
+      setBaskets(baskets);
+      console.log('baskets:', baskets);
     } catch (error) {
       console.error("Error fetching baskets:", error);
     }
   }
 
   useEffect(() => {
-    // fetchBaskets();
-      fetchRequests('1');
+    fetchBaskets();
+    fetchRequests('1'); // for testing right now
   }, []);
 
+  // given a basket id (an integer formatted as a string) fetch all the requests belonging to a basket
   const fetchRequests = async (basketID: string) => {
     try {
       const response = await axios.get(
@@ -41,6 +43,7 @@ function App() {
     }
   }
 
+  // given a basket id, return a basket
   const fetchBasket = async (basketID: string) => {
     try {
       const response = await axios.get(`/api/baskets/${basketID}`)
@@ -64,10 +67,17 @@ function App() {
     }
   }
 
+  const onBasketClick = (id:string) => {
+    // this is where the routing will go to the basket page
+    console.log(`you clicked basket id: ${id}`)
+  }
 
   return (
     <>
-      Živeli!
+      <MyBasketsContainer
+        baskets={baskets}
+        onBasketClick={onBasketClick}
+      />
     </>
   )
 }
