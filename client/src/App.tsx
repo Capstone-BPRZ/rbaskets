@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import axios from "axios";
+import { BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 import type {Basket, Request} from "./types";
 import MyBasketsContainer from "./components/MyBasketsContainer.tsx";
 
 
 function App() {
   const [baskets, setBaskets] = useState<Basket[]>([]);
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [currentBasket, setCurrentBasket] = useState<Basket | null>(null);
+  // const [isModalOpen, setModalOpen] = useState(false);
+  // const [currentBasket, setCurrentBasket] = useState<Basket | null>(null);
   const [requests, setRequests] = useState<Request[]>([]);
 
   const baseURL = 'http://localhost:3000';
@@ -28,7 +29,7 @@ function App() {
 
   useEffect(() => {
     fetchBaskets();
-    // fetchRequests('1'); // for testing right now
+    fetchRequests('1'); // for testing right now
   }, []);
 
   // given a basket id (an integer formatted as a string) fetch all the requests belonging to a basket
@@ -37,9 +38,9 @@ function App() {
       const response = await axios.get(
         `${baseURL}/api/baskets/${basketID}/requests`
       );
-      const data = response.data
-      setRequests(data.requests);
-      console.log(`requests for basket ${basketID}:`, response.data);
+      const requestsData = response.data.requests
+      setRequests(requestsData);
+      console.log(`requests for basket ${basketID}:`, requestsData);
     } catch (e) {
       console.log(e)
     }
@@ -75,12 +76,15 @@ function App() {
   }
 
   return (
-    <>
+    <Router>
+      <div>
+
+      </div>
       <MyBasketsContainer
         baskets={baskets}
         onBasketClick={onBasketClick}
       />
-    </>
+    </Router>
   )
 }
 

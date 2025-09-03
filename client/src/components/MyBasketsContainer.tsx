@@ -1,14 +1,16 @@
 import type {Basket} from "../types";
+import { Link } from 'react-router-dom'
+
 
 interface MyBasketsContainerProps {
-  baskets: Basket[];
-  onBasketClick: (id: string) => void;
+  baskets: Basket[],
+  onBasketClick: (id: string) => void,
 }
 
 const MyBasketsContainer = ({
                               baskets,
-                              onBasketClick
-}: MyBasketsContainerProps) => {
+                              onBasketClick,
+                            }: MyBasketsContainerProps) => {
   return (
     <>
       <div id='basket-container'>
@@ -17,9 +19,9 @@ const MyBasketsContainer = ({
           <tbody>
           {baskets.map(basket => {
             return (
-              <tr>
+              <tr key={basket.id}>
                 <td className='basket_list_item' onClick={() => onBasketClick(String(basket.id))}>
-                  <h3>{basket.basket_path}</h3>
+                  <Link to={`/baskets/${basket.basket_path}`}>{basket.basket_path}</Link>
                 </td>
               </tr>
             )
