@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 
 dotenv.config({ path: `${__dirname}/../.env` });
 
-mongoose.set('strictQuery', false)
+mongoose.set('strictQuery', false);
 
 const requestBodySchema = new mongoose.Schema({
   body: String,
@@ -106,10 +106,10 @@ async function selectRequest(requestId: string): Promise<RequestData | null> {
     const queryResult = await client.query<RequestDB>(selectQuery, [requestId]);
     const pgRequest = queryResult.rows[0];
 
-    await mongoose.connect(process.env.MONGODB_URI as string)
+    await mongoose.connect(process.env.MONGODB_URI as string);
 
     const mongoResult = await RequestBody.findById(pgRequest.body_id);
-    const mongoBody = mongoResult?.body || ""
+    const mongoBody = mongoResult?.body || "";
 
     const fullRequest: RequestData = {
       id: pgRequest.id,
@@ -140,15 +140,15 @@ async function selectAllRequests(basketId: string): Promise<RequestData[] | null
     const result = await client.query<RequestDB>(selectQuery, [basketId]);
     const pgRequests = result.rows;
 
-    await mongoose.connect(process.env.MONGODB_URI as string)
+    await mongoose.connect(process.env.MONGODB_URI as string);
 
     const mongoBodies = await Promise.allSettled(pgRequests.map(async pgRequest => {
-      return await RequestBody.findById(pgRequest.body_id)
-    }))
+      return await RequestBody.findById(pgRequest.body_id);
+    }));
 
     const resultBodies = mongoBodies.map(result => {
       return (result.status === "fulfilled") ? result.value?.body : "";
-    })
+    });
 
     const fullRequestList = pgRequests.map((pgRequest, idx) => {
       const fullRequest: RequestData = {
@@ -161,7 +161,7 @@ async function selectAllRequests(basketId: string): Promise<RequestData[] | null
       };
 
       return fullRequest;
-    })
+    });
 
     return fullRequestList;
 
