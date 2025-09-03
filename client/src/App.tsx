@@ -1,35 +1,56 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useEffect } from 'react'
+import axios from "axios";
+import ModalForm from "./components/ModalForm"
+import Content from "./components/Content"
+import Navbar from './components/Navbar'
 import './App.css'
+import { Basket, Request } from "./types/index"
+import { selectAllRequests, createBasket }
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [baskets, setBaskets] = useState<Basket[]>([]);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [currentBasket, setCurrentBasket] = useState<Basket | null>(null);
+  const [requests, setRequests] = useState<Request[]>([]);
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+  useEffect(() => {
+    fetchBaskets();
+  }, []);
+
+  const fetchBaskets = async () => {
+    try {
+      const response = await axios.get<Basket>("/api/baskets");
+      setBaskets(response.data);
+    } catch (error) {
+      console.error("Error fetching baskets:", error);
+    }
+  };
+
+  const fetchBasket = async (basket) => {
+    try {
+      const response = await axios.get(`/api/baskets/${basket.id}`)
+      setCurrentBasket(response.data);
+    } catch (error) {
+      console.error("Error fetching basket:", error);
+    }
+  }
+
+  const deleteBasket = (basket) => {
+    axios.delete(`/api/todos/${basket.id}`);
+    fetchBaskets();
+  }
+
+  const addBasket = async (basket) => {
+    try {
+      await axios.post(`/api/baskets`, basket);
+      fetchBaskets();
+    } catch (error) {
+      console.error("Error creating basket:", error);
+    }
+  }
+
+
+  return ()
 }
 
-export default App
+export default App;
