@@ -1,6 +1,6 @@
 import { Client } from 'pg';
 import generatePath from './path_generator';
-import type { user_id, RequestDB, RequestData, BasketData, } from "../types.js";
+import type { user_id, UserData, RequestDB, RequestData, BasketData, } from "../types.js";
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 
@@ -252,7 +252,56 @@ async function deleteBasket(basketId: string): Promise<string | null> {
   }
 }
 
-export { selectRequest, selectAllRequests,
-         selectBasket, selectAllBaskets,
-         createBasket, addRequestToBasket, deleteBasket,
+async function createUser(): Promise<UserData | null> {
+  let client;
+  try {
+    client = await connectSQL();
+    await client.query('BEGIN');
+
+    const getTokenStatement = "SELECT token FROM users";
+    const allTokensResult = await client.query<{ token: string }>(getTokenStatement);
+    const allTokens: string[] = allTokensResult.rows.map(el => el.token);
+    const userToken: string = generatePath(allTokens);
+
+    const insertStatement = "INSERT INTO users (token) VALUES ($1)";
+    await client.query(insertStatement, [userToken]);
+    await client.query('COMMIT');
+
+    const getNewUserStatement = "SELECT * FROM users WHERE token = $1";
+    const newUserResult = await client.query<UserData>(getNewUserStatement, [userToken]);
+
+    return newUserResult.rows[0] || null;
+  } catch (err) {
+    if (client) {
+      await client.query('ROLLBACK');
+    }
+    console.error(err);
+    return null;
+  } finally {
+    if (client) {
+      await client.end();
+    }
+  }
+}
+
+async function selectUser(token: string): Promise<number | null> {
+  let client;
+  try {
+    client = await connectSQL();
+    const selectQuery = "SELECT id FROM users WHERE token = $1";
+    const result = await client.query<RequestDB>(selectQuery, [token]);
+    return result.rows[0].id
+  } catch (err) {
+    console.error(err);
+    return null;
+  } finally {
+    if (client) {
+      await client.end();
+    }
+  }
+}
+
+export { selectRequest, selectAllRequests, addRequestToBasket,
+         selectBasket, selectAllBaskets, createBasket, deleteBasket,
+         selectUser, createUser,
          RequestBody };

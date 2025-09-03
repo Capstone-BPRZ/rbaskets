@@ -1,14 +1,45 @@
-import { RequestData, RequestDB, BasketData } from "../types";
-import { selectRequest, selectAllRequests, createBasket, addRequestToBasket, deleteBasket, RequestBody, selectBasket, selectAllBaskets } from "./db_service";
+import { RequestData, RequestDB, BasketData, UserData } from "../types";
+import { selectRequest, selectAllRequests, createBasket, addRequestToBasket, deleteBasket, RequestBody, selectBasket, selectAllBaskets, selectUser, createUser } from "./db_service";
 import { Client } from 'pg';
 import mongoose from 'mongoose';
 
 mongoose.set('strictQuery', false)
 
+test('gets correct user id based on token', async () => {
+  const myRequest: number | null = await selectUser('zyxwvut')
+  expect(myRequest).toBe(1);
+});
+
 test('adds a request to the appropriate databases', async () => {
   const myRequest: RequestData | null = await addRequestToBasket('1', new Date(), 'GET', 'some headers', 'some body');
   expect(myRequest?.headers).toBe('some headers');
 });
+
+test('adds a new user', async () => {
+  const client = new Client({
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 5432,
+      database: process.env.DB_NAME
+    });
+
+  await client.connect();
+
+  const selectQuery = "SELECT token FROM users";
+  const selectResult = await client.query<Pick<UserData, 'token'>>(selectQuery);
+  const oldUserCount = selectResult.rowCount;
+  const oldUserTokens = selectResult.rows.map(row => row.token)
+
+  const myRequest: UserData | null = await createUser();
+
+  const newSelectResult = await client.query<Pick<UserData, 'token'>>(selectQuery);
+  const newUserCount = newSelectResult.rowCount;
+
+  expect(newUserCount).toBe((oldUserCount ?? 0) + 1);
+  expect(oldUserTokens).not.toContain(myRequest?.token)
+  await client.end()
+})
 
 test('gets an individual basket', async () => {
   const myRequest: BasketData | null = await selectBasket(1);

@@ -21,6 +21,11 @@ export interface BasketData {
     user_id: number;
 }
 
+export interface UserData {
+    id: number;
+    token: string;
+}
+
 export type user_id = number;
 
 
