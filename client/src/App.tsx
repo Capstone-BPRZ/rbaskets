@@ -1,11 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
 import axios from "axios";
-import ModalForm from "./components/ModalForm"
-import Content from "./components/Content"
-import Navbar from './components/Navbar'
-import './App.css'
-import { Basket, Request } from "./types/index"
-import { selectAllRequests, createBasket }
+import type {Basket, Request} from "./types";
+
 
 function App() {
   const [baskets, setBaskets] = useState<Basket[]>([]);
@@ -13,18 +9,23 @@ function App() {
   const [currentBasket, setCurrentBasket] = useState<Basket | null>(null);
   const [requests, setRequests] = useState<Request[]>([]);
 
-  useEffect(() => {
-    fetchBaskets();
-  }, []);
+  const baseURL = 'http://localhost:3000';
+
 
   const fetchBaskets = async () => {
     try {
-      const response = await axios.get<Basket>("/api/baskets");
+      const response = await axios.get<Basket[]>(`${baseURL}/api/baskets`);
       setBaskets(response.data);
     } catch (error) {
       console.error("Error fetching baskets:", error);
     }
-  };
+  }
+
+  useEffect(() => {
+    fetchBaskets();
+    console.log('baskets:', baskets);
+  }, []);
+
 
   const fetchBasket = async (basket) => {
     try {
@@ -35,14 +36,14 @@ function App() {
     }
   }
 
-  const deleteBasket = (basket) => {
-    axios.delete(`/api/todos/${basket.id}`);
+  const deleteBasket = async (basket: Basket) => {
+    await axios.delete(`/api/todos/${basket.id}`);
     fetchBaskets();
   }
 
-  const addBasket = async (basket) => {
+  const addBasket = async () => {
     try {
-      await axios.post(`/api/baskets`, basket);
+      await axios.post(`/api/baskets`);
       fetchBaskets();
     } catch (error) {
       console.error("Error creating basket:", error);
@@ -50,7 +51,11 @@ function App() {
   }
 
 
-  return ()
+  return (
+    <>
+      Živeli!
+    </>
+  )
 }
 
 export default App;

@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import { selectRequest, selectAllRequests, createBasket, addRequestToBasket } from './services/db_service';
  import { RequestData, BasketData } from './types';
 
@@ -12,6 +13,11 @@ const PORT = process.env.PORT || 3000;
  
 
 app.use(express.json());
+app.use(cors());
+
+app.get('/', (_req: Request, res: Response) => {
+  res.send('Živeli!');
+});
 
 app.all('/api/baskets/:basketId/makeRequest', async (req: Request, res: Response) => { // decided to add the basketId to the route as the requests coming in only pertain to a particular route. 
   try {
