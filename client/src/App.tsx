@@ -15,21 +15,35 @@ function App() {
   const fetchBaskets = async () => {
     try {
       const response = await axios.get<Basket[]>(`${baseURL}/api/baskets`);
-      setBaskets(response.data);
+      const data = response.data;
+      setBaskets(data.baskets);
+      console.log('baskets:', response.data);
     } catch (error) {
       console.error("Error fetching baskets:", error);
     }
   }
 
   useEffect(() => {
-    fetchBaskets();
-    console.log('baskets:', baskets);
+    // fetchBaskets();
+      fetchRequests('1');
   }, []);
 
-
-  const fetchBasket = async (basket) => {
+  const fetchRequests = async (basketID: string) => {
     try {
-      const response = await axios.get(`/api/baskets/${basket.id}`)
+      const response = await axios.get(
+        `${baseURL}/api/baskets/${basketID}/requests`
+      );
+      const data = response.data
+      setRequests(data.requests);
+      console.log(`requests for basket ${basketID}:`, response.data);
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  const fetchBasket = async (basketID: string) => {
+    try {
+      const response = await axios.get(`/api/baskets/${basketID}`)
       setCurrentBasket(response.data);
     } catch (error) {
       console.error("Error fetching basket:", error);
