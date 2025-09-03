@@ -1,8 +1,9 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import { selectRequest, selectAllRequests, createBasket, addRequestToBasket } from './services/db_service';
+import { selectBasket, selectAllBaskets, selectRequest, selectAllRequests, createBasket, addRequestToBasket } from './services/db_service';
  import { RequestData, BasketData } from './types';
+
 
 dotenv.config();
 
@@ -47,6 +48,51 @@ app.all('/api/baskets/:basketId/makeRequest', async (req: Request, res: Response
     }
     return res.status(500).json({ error: 'Unknown error.' });
   }
+});
+
+app.get('/api/baskets', async (_req: Request, res: Response) => {
+  try {
+    const baskets = await selectAllBaskets(userId);
+
+    return res.status(200).json({
+      baskets: baskets,
+    });
+  } catch (err) {
+    if (err instanceof Error) {
+      console.error(err);
+      return res.status(500).json({ error: err.message || 'Internal server error' });
+    }
+    return res.status(500).json({ error: 'Unknown error' });
+  }
+});
+
+
+app.get('/api/baskets/:basketId', async (req: Request, res:Response) => {
+
+
+  try {
+      const basketId = parseInt(req.params.basketId, 10); 
+
+    if (isNaN(basketId)) {
+      return res.status(404).json({error: "Not a valid basket Id."});
+    }
+    const basket = await selectBasket(basketId); 
+
+    if (!basket) {
+      return res.status(404).json({error: 'Basket not found'}); 
+    }
+
+    return res.status(200).json({
+      basket: basket
+    });
+  } catch (err) {
+    if (err instanceof Error) {
+      console.log(err);
+      return res.status(500).json({err: err.message || "Internal Server Error"});
+    }
+    return res.status(500).json({err: 'Unknown error.'});
+  }
+
 });
 
 
