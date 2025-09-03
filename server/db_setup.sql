@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS users (
-  id serial PRIMARY KEY
+  id serial PRIMARY KEY,
+  token char(7) UNIQUE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS baskets (
@@ -17,7 +18,7 @@ CREATE TABLE IF NOT EXISTS requests (
   body_id text
 );
 
-INSERT INTO users (id) VALUES (1);
+INSERT INTO users (id) VALUES (1, 'zyxwvut');
 
 INSERT INTO baskets (user_id, basket_path) VALUES
 (1, 'abcdefg'), (1, '1234567');
