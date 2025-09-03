@@ -64,6 +64,40 @@ async function createBasket(userId: user_id): Promise<BasketData | null> {
   }
 }
 
+async function selectAllBaskets(userId: user_id): Promise<BasketData[] | null> {
+  let client;
+  try {
+    client = await connectSQL();
+    const selectQuery = "SELECT id, user_id, basket_path FROM baskets WHERE user_id = $1";
+    const queryResult = await client.query<BasketData>(selectQuery, [userId]);
+    return queryResult.rows;
+  } catch (err) {
+    console.error(err);
+    return null;
+  } finally {
+    if (client) {
+      await client.end();
+    }
+  }
+}
+
+async function selectBasket(basketId: number): Promise<BasketData | null> {
+  let client;
+  try {
+    client = await connectSQL();
+    const selectQuery = "SELECT id, user_id, basket_path FROM baskets WHERE id = $1";
+    const queryResult = await client.query<BasketData>(selectQuery, [basketId]);
+    return queryResult.rows[0];
+  } catch (err) {
+    console.error(err);
+    return null;
+  } finally {
+    if (client) {
+      await client.end();
+    }
+  }
+}
+
 async function selectRequest(requestId: string): Promise<RequestData | null> {
   let client;
   try {
@@ -198,7 +232,6 @@ async function deleteBasket(basketId: string): Promise<string | null> {
     const selectQuery = "SELECT body_id FROM requests WHERE basket_id = $1";
     const result = await client.query<RequestDB>(selectQuery, [basketId]);
     const bodyIds = result.rows.map(row => row.body_id);
-    console.log('body id list:', bodyIds)
 
     const deleteQuery = "DELETE FROM baskets WHERE id = $1";
     await client.query<RequestDB>(deleteQuery, [basketId]);
@@ -219,6 +252,7 @@ async function deleteBasket(basketId: string): Promise<string | null> {
   }
 }
 
-export { selectRequest, selectAllRequests, createBasket, addRequestToBasket, deleteBasket, RequestBody };
-
-
+export { selectRequest, selectAllRequests,
+         selectBasket, selectAllBaskets,
+         createBasket, addRequestToBasket, deleteBasket,
+         RequestBody };
