@@ -1,11 +1,7 @@
 import { useState, useEffect } from 'react'
-import axios from "axios";
-import ModalForm from "./components/ModalForm"
-import Content from "./components/Content"
-import Navbar from './components/Navbar'
-import './App.css'
-import { Basket, Request } from "./types/index"
-import { selectAllRequests, createBasket }
+import axios from "axios"
+import type {Basket, Request} from "./types";
+
 
 function App() {
   const [baskets, setBaskets] = useState<Basket[]>([]);
