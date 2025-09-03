@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import axios from "axios"
+import { useState, useEffect } from 'react';
+import axios from "axios";
 import type {Basket, Request} from "./types";
 
 
@@ -9,9 +9,12 @@ function App() {
   const [currentBasket, setCurrentBasket] = useState<Basket | null>(null);
   const [requests, setRequests] = useState<Request[]>([]);
 
+  const baseURL = 'http://localhost:3000';
+
+
   const fetchBaskets = async () => {
     try {
-      const response = await axios.get<Basket[]>("/api/baskets");
+      const response = await axios.get<Basket[]>(`${baseURL}/api/baskets`);
       setBaskets(response.data);
     } catch (error) {
       console.error("Error fetching baskets:", error);
@@ -20,6 +23,7 @@ function App() {
 
   useEffect(() => {
     fetchBaskets();
+    console.log('baskets:', baskets);
   }, []);
 
 
@@ -33,13 +37,13 @@ function App() {
   }
 
   const deleteBasket = async (basket: Basket) => {
-    axios.delete(`/api/todos/${basket.id}`);
+    await axios.delete(`/api/todos/${basket.id}`);
     fetchBaskets();
   }
 
-  const addBasket = async (basket) => {
+  const addBasket = async () => {
     try {
-      await axios.post(`/api/baskets`, basket);
+      await axios.post(`/api/baskets`);
       fetchBaskets();
     } catch (error) {
       console.error("Error creating basket:", error);
@@ -48,6 +52,9 @@ function App() {
 
 
   return (
+    <>
+      Živeli!
+    </>
   )
 }
 
