@@ -21,14 +21,13 @@ const MyBasketsContainer = ({
             return (
               <tr key={basket.id}>
                 <td className='basket_list_item' onClick={() => onBasketClick(String(basket.id))}>
-                  <Link to={`/baskets/${basket.basket_path}`}>{basket.basket_path}</Link>
+                  <Link to={`/baskets/${basket.id}`}>{basket.basket_path}</Link>
                 </td>
               </tr>
             )
           })}
           </tbody>
         </table>
-
       </div>
     </>
   )
