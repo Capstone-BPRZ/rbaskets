@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 mongoose.set('strictQuery', false)
 
 test('adds a request to the appropriate databases', async () => {
-  const myRequest: RequestData | null = await addRequestToBasket('1', new Date(), 'GET', 'some headers', 'some body');
+  const myRequest: RequestData | null = await addRequestToBasket(1, new Date(), 'GET', 'some headers', 'some body');
   expect(myRequest?.headers).toBe('some headers');
 });
 
@@ -41,7 +41,7 @@ test('gets body data from Mongo during select', async () => {
 });
 
 test('gets body data from Mongo during selectAll', async () => {
-  const myRequest: RequestData[] | null = await selectAllRequests('1');
+  const myRequest: RequestData[] | null = await selectAllRequests(1);
   expect(myRequest?.map(request => request.body)).toContain('some body');
 });
 
@@ -50,7 +50,7 @@ test('deleting a basket deletes its requests and mongo bodies', async() => {
 
   if (!newBasket) return;
 
-  const basketId = String(newBasket.id)
+  const basketId = newBasket.id
 
   await addRequestToBasket(basketId, new Date(), 'GET', 'delete test headers', `delete test body for ${basketId}`);
 
