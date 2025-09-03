@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import { createUser, selectBasket, selectAllBaskets, selectRequest, selectAllRequests, createBasket, addRequestToBasket } from './services/db_service';
+import { selectUser, createUser, selectBasket, selectAllBaskets, selectRequest, selectAllRequests, createBasket, addRequestToBasket } from './services/db_service';
  import { RequestData, BasketData, UserData } from './types';
 
 
@@ -66,6 +66,28 @@ app.get('/api/baskets', async (_req: Request, res: Response) => {
   }
 });
 
+app.get('/api/baskets/:user_token', async (req: Request, res: Response) => {
+  try {
+    const userId = await selectUser(req.params.user_token);
+
+    if (!userId) {
+      return res.status(404).json({error: 'Invalid user token'});
+    }
+
+    const baskets = await selectAllBaskets(userId);
+
+    return res.status(200).json({
+      baskets: baskets,
+    });
+  } catch (err) {
+    if (err instanceof Error) {
+      console.error(err);
+      return res.status(500).json({ error: err.message || 'Internal server error' });
+    }
+    return res.status(500).json({ error: 'Unknown error' });
+  }
+});
+
 
 app.get('/api/baskets/:basketId', async (req: Request, res:Response) => {
 
@@ -97,47 +119,47 @@ app.get('/api/baskets/:basketId', async (req: Request, res:Response) => {
 
 
 
- app.get('/api/baskets/:basket/requests', async (req: Request, res: Response) => {
-      try {
-         const basketId = req.params.basket;
-         const requests: RequestData[] | null = await selectAllRequests(basketId);
+app.get('/api/baskets/:basket/requests', async (req: Request, res: Response) => {
+  try {
+      const basketId = req.params.basket;
+      const requests: RequestData[] | null = await selectAllRequests(basketId);
 
-         res.status(200).json({
-           requests: requests
-         });
-       } catch (error) {
-        if (error instanceof Error) {
-          console.error(error);
-          res.status(500).json({ error: error.message || 'Basket not found' });
-        }
-      }
+      res.status(200).json({
+        requests: requests
+      });
+    } catch (error) {
+    if (error instanceof Error) {
+      console.error(error);
+      res.status(500).json({ error: error.message || 'Basket not found' });
+    }
+  }
+});
+
+
+
+app.get('/api/baskets/:basket/requests/:request',  async (req: Request, res: Response) => {
+  try {
+    const requestId = req.params.request;
+
+    if (!requestId) {
+      return res.status(400).json({error: "missing requestId"});
+    }
+      const request:RequestData | null = await selectRequest(requestId);
+
+    if (!request) {
+      return res.status(404).json({error: 'Missing Request'});
+    }
+    return  res.status(200).json({
+      request: request
     });
-
-
-
-    app.get('/api/baskets/:basket/requests/:request',  async (req: Request, res: Response) => {
-      try {
-        const requestId = req.params.request;
-
-        if (!requestId) {
-          return res.status(400).json({error: "missing requestId"});
-        }
-         const request:RequestData | null = await selectRequest(requestId);
-
-        if (!request) {
-          return res.status(404).json({error: 'Missing Request'});
-        }
-       return  res.status(200).json({
-          request: request
-        });
-      } catch(err) {
-        if (err instanceof Error) {
-          console.log(err);
-          return res.status(500).json({err: err.message || 'Request not found'});
-        }
-        return res.status(500).json({err: 'Unknown error.'});
-      }
-    });
+  } catch(err) {
+    if (err instanceof Error) {
+      console.log(err);
+      return res.status(500).json({err: err.message || 'Request not found'});
+    }
+    return res.status(500).json({err: 'Unknown error.'});
+  }
+});
 
 
 
