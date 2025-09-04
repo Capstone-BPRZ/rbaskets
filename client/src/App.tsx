@@ -12,6 +12,7 @@ function App() {
   // const [isModalOpen, setModalOpen] = useState(false);
   // const [currentBasket, setCurrentBasket] = useState<Basket | null>(null);
   const [currentBasket, setCurrentBasket] = useState<Basket | null>(null);
+  const [newBasketPath, setNewBasketPath] = useState<string | null>(null);
   const [requests, setRequests] = useState<Request[]>([]);
 
   const baseURL = 'http://localhost:3000';
@@ -67,7 +68,7 @@ function App() {
   const addBasket = async () => {
     try {
       const response = await axios.post(`${baseURL}/api/baskets/create`);
-      setCurrentBasket(response.data)
+      setNewBasketPath(response.data.basket_path)
       console.log(response.data)
     } catch (error) {
       console.error("Error creating basket: ", error);
@@ -79,6 +80,7 @@ function App() {
       <div>
         <h1>rBaskets</h1>
       </div>
+      <Modal handleToggle={toggleModal} isModalOpen={isModalOpen} newBasketPath={newBasketPath}></Modal>
       <MyBasketsContainer baskets={baskets}/>
       <CreateBasketButton onCreateClick={addBasket}/>
 
