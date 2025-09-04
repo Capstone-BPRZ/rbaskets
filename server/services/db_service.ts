@@ -185,7 +185,7 @@ async function basketIdFromPath(basketPath: string) {
     pgClient = await connectSQL();
     const getBasketIdStatement = "SELECT id FROM baskets WHERE basket_path = $1"
     const basketIdResult = await pgClient.query(getBasketIdStatement, [basketPath])
-    return basketIdResult.rows[0].id
+    return basketIdResult.rows[0]?.id
   } catch (err) {
     console.error(err);
     return null;

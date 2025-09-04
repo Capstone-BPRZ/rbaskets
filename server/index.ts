@@ -1,17 +1,14 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import { selectBasket, selectAllBaskets, selectRequest, selectAllRequests, createBasket, addRequestToBasket } from './services/db_service';
- import { RequestData, BasketData } from './types';
-
+import { selectBasket, selectAllBaskets, selectRequest, selectAllRequests, createBasket, addRequestToBasket, deleteBasket } from './services/db_service';
+import { RequestData, BasketData } from './types';
 
 dotenv.config();
 
 const app = express();
 const userId = 1;
 const PORT = process.env.PORT || 3000;
-
-
 
 app.use(express.json());
 app.use(cors());
@@ -161,10 +158,27 @@ app.post('/api/baskets/create', async (_req: Request, res: Response) => {
 
 });
 
-/*
-app.delete('/api/baskets/basket_id', (req: Request, res: Response) => {
+app.delete('/api/baskets/:basketPath', async (req: Request, res: Response) => {
+  try {
+    const deletedBasketId = await deleteBasket(req.params.basketPath);
+
+    if (!deletedBasketId) {
+      return res.status(404).json({error: 'No such basket exists.'});
+    }
+
+    return res.status(204).send()
+  } catch (err) {
+    if (err instanceof Error) {
+      console.log('Error deleting basket:', err);
+       return res.status(500).json({
+      err: err.message || 'Internal server error.'
+    });
+    }
+   return res.status(500).json({
+    err: 'Unknown error occurred.'
+   });
+  }
 });
-*/
 
 app.listen(PORT, () => {
      console.log(`Server is running on port ${PORT}`);
