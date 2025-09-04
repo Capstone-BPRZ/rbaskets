@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import axios from "axios";
 import { BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 import type {Basket, Request} from "./types";
-import MyBasketsContainer from "./components/MyBasketsContainer";
-import BasketPage from "./components/BasketPage";
+import MyBasketsContainer from "./components/MyBasketsContainer.tsx";
+import BasketPage from "./components/BasketPage.tsx";
 
 
 function App() {
@@ -88,9 +88,14 @@ function App() {
   //   </Routes>
   // </Router>
 <div>
-  {
-    <BasketPage currentBasket={currentBasket} requests={requests} />
-  }
+  {currentBasket ? (
+    <BasketPage
+      currentBasket={currentBasket}
+      requests={requests}
+    />
+  ) : (
+    <p>Loading basket...</p>
+  )}
 </div>
   )
 }
