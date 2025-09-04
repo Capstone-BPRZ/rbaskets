@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 import type {Basket, Request} from "./types";
 import MyBasketsContainer from "./components/MyBasketsContainer.tsx";
 import BasketPage from "./components/BasketPage.tsx";
+import CreateBasketButton from "./components/CreateBasketButton.tsx";
 
 
 function App() {
@@ -81,10 +82,8 @@ function App() {
       <div>
 
       </div>
-      <MyBasketsContainer
-        baskets={baskets}
-        onBasketClick={onBasketClick}
-      />
+      <MyBasketsContainer baskets={baskets}/>
+      <CreateBasketButton onCreateClick={addBasket()}/>
 
       <Routes>
         <Route path="/baskets/:id`" element={<BasketPage requests={requests}></BasketPage>}></Route>
