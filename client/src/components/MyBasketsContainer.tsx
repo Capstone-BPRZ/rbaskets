@@ -4,13 +4,9 @@ import { Link } from 'react-router-dom'
 
 interface MyBasketsContainerProps {
   baskets: Basket[],
-  onBasketClick: (id: string) => void,
 }
 
-const MyBasketsContainer = ({
-                              baskets,
-                              onBasketClick,
-                            }: MyBasketsContainerProps) => {
+const MyBasketsContainer = ({baskets}: MyBasketsContainerProps) => {
   return (
     <>
       <div id='basket-container'>
@@ -20,7 +16,7 @@ const MyBasketsContainer = ({
           {baskets.map(basket => {
             return (
               <tr key={basket.id}>
-                <td className='basket_list_item' onClick={() => onBasketClick(String(basket.id))}>
+                <td className='basket_list_item'>
                   <Link to={`/baskets/${basket.id}`}>{basket.basket_path}</Link>
                 </td>
               </tr>
