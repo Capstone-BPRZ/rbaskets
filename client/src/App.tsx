@@ -66,14 +66,12 @@ function App() {
   // creates a basket and adds it to the database
   const addBasket = async () => {
     try {
-      await axios.post(`/api/baskets/create`);
+      await axios.post(`${baseURL}/api/baskets/create`);
       fetchBaskets();
     } catch (error) {
       console.error("Error creating basket: ", error);
     }
   }
-
-
 
   return (
     <Router>
