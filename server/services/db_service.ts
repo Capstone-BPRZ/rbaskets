@@ -132,7 +132,7 @@ async function selectRequest(requestId: string): Promise<RequestData | null> {
   }
 }
 
-async function selectAllRequests(basketId: string): Promise<RequestData[] | null> {
+async function selectAllRequests(basketId: number): Promise<RequestData[] | null> {
   let client;
   try {
     client = await connectSQL();
@@ -176,7 +176,7 @@ async function selectAllRequests(basketId: string): Promise<RequestData[] | null
   }
 }
 
-async function addRequestToBasket(basketId: string, timestamp: Date, method: string, headers: string, body: string): Promise<RequestData | null> {
+async function addRequestToBasket(basketId: number, timestamp: Date, method: string, headers: string, body: string): Promise<RequestData | null> {
   let pgClient;
   try {
     await mongoose.connect(process.env.MONGODB_URI as string)
@@ -225,7 +225,7 @@ async function addRequestToBasket(basketId: string, timestamp: Date, method: str
   }
 }
 
-async function deleteBasket(basketId: string): Promise<string | null> {
+async function deleteBasket(basketId: number): Promise<number | null> {
   let client;
   try {
     client = await connectSQL();
