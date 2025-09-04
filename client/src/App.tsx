@@ -20,7 +20,6 @@ function App() {
 
   useEffect(() => {
     fetchBaskets();
-    fetchRequests('1');
   }, []);
 
   // fetch all the baskets that belong to a user
@@ -30,7 +29,6 @@ function App() {
       console.log(response)
       const baskets: Basket[] = response.data.baskets;
       setBaskets(baskets);
-      setCurrentBasket(baskets[0] || null);
       console.log('baskets:', baskets);
     } catch (error) {
       console.error("Error fetching baskets:", error);
@@ -74,28 +72,17 @@ function App() {
   }
 
   return (
-
-  </Router>
-    // <div>
-    //   <BasketPage
-    //     currentBasket={currentBasket}
-    //     requests={requests}
-    //     request={currentRequest}
-    //   />
-    // </div>
-
+    <Router>
       <div>
         <h1>rBaskets</h1>
       </div>
       <Modal handleToggle={toggleModal} isModalOpen={isModalOpen} newBasketPath={newBasketPath}></Modal>
       <MyBasketsContainer baskets={baskets}/>
       <CreateBasketButton onCreateClick={addBasket}/>
-
       <Routes>
         {/*<Route path="/baskets/:id`" element={<BasketPage requests={requests}></BasketPage>}></Route>*/}
       </Routes>
     </Router>
-
   )
 }
 
