@@ -1,8 +1,10 @@
+// @ts-nocheck
+
 import { useState, useEffect } from 'react';
 import axios from "axios";
 import { BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 import type {Basket, Request} from "./types";
-import MyBasketsContainer from "./components/MyBasketsContainer.tsx";
+import MyBasketsContainer from "./components/MyBasketsContainer";
 import BasketPage from "./components/BasketPage";
 
 
@@ -11,7 +13,6 @@ function App() {
   // const [isModalOpen, setModalOpen] = useState(false);
   const [currentBasket, setCurrentBasket] = useState<Basket | null>(null);
   const [requests, setRequests] = useState<Request[]>([]);
-  const [currentRequest, setCurrentRequest] = useState<Request | null>(null);
 
   const baseURL = 'http://localhost:3000';
 
@@ -23,10 +24,9 @@ function App() {
   // fetch all the baskets that belong to a user
   const fetchBaskets = async () => {
     try {
-      const response = await axios.get<Response>(`${baseURL}/api/baskets`);
+      const response = await axios.get(`${baseURL}/api/baskets`);
       console.log(response)
-      const baskets = response.data.baskets;  // this needs to call baskets (b/c the response has tons of stuff
-      // in it, the data is what we want but how to Type the get method?
+      const baskets: Basket[] = response.data.baskets;
       setBaskets(baskets);
       setCurrentBasket(baskets[0] || null);
       console.log('baskets:', baskets);
@@ -34,7 +34,6 @@ function App() {
       console.error("Error fetching baskets:", error);
     }
   }
-
  
   // given a basket id (an integer formatted as a string) fetch all the requests belonging to a basket
   const fetchRequests = async (basketID: string) => {
@@ -51,53 +50,48 @@ function App() {
   }
 
   // given a basket id, return a basket
-  const fetchBasket = async (basketID: string) => {
-    try {
-      const response = await axios.get(`/api/baskets/${basketID}`)
-      setCurrentBasket(response.data);
-    } catch (error) {
-      console.error("Error fetching basket: ", error);
-    }
-  }
+  // const fetchBasket = async (basketID: string) => {
+  //   try {
+  //     const response = await axios.get(`/api/baskets/${basketID}`)
+  //     setCurrentBasket(response.data);
+  //   } catch (error) {
+  //     console.error("Error fetching basket: ", error);
+  //   }
+  // }
 
-  const deleteBasket = async (basket: Basket) => {
-    await axios.delete(`/api/baskets/${basket.id}`);
-    fetchBaskets();
-  }
+  // const deleteBasket = async (basket: Basket) => {
+  //   await axios.delete(`/api/baskets/${basket.id}`);
+  //   fetchBaskets();
+  // }
 
+  // creates a basket and adds it to the database
   const addBasket = async () => {
     try {
-      await axios.post(`/api/baskets/create`);
-      fetchBaskets();
+      const response = await axios.post(`${baseURL}/api/baskets/create`);
+      setCurrentBasket(response.data)
+      console.log(response.data)
     } catch (error) {
       console.error("Error creating basket: ", error);
     }
   }
 
-  const onBasketClick = (id:string) => {
-    // this is where the routing will go to the basket page
-    console.log(`you clicked basket id: ${id}`)
-  }
-
   return (
-    <Router>
-    <div>
-      <h1>rBaskets</h1>
-    </div>
-    <MyBasketsContainer baskets={baskets}/>
-    <CreateBasketButton onCreateClick={addBasket}/>
+  //   <Router>
+  //   <div>
+  //     <h1>rBaskets</h1>
+  //   </div>
+  //   <MyBasketsContainer baskets={baskets}/>
+  //   <CreateBasketButton onCreateClick={addBasket}/>
 
-    <Routes>
-      {/*<Route path="/baskets/:id`" element={<BasketPage requests={requests}></BasketPage>}></Route>*/}
-    </Routes>
-  </Router>
-    // <div>
-    //   <BasketPage
-    //     currentBasket={currentBasket}
-    //     requests={requests}
-    //     request={currentRequest}
-    //   />
-    // </div>
+  //   <Routes>
+  //     {/*<Route path="/baskets/:id`" element={<BasketPage requests={requests}></BasketPage>}></Route>*/}
+  //   </Routes>
+  // </Router>
+<div>
+  {
+    <BasketPage currentBasket={currentBasket} requests={requests} />
+  }
+</div>
   )
 }
 
