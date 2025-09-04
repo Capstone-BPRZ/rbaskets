@@ -82,7 +82,7 @@ function App() {
 
       </div>
       <MyBasketsContainer baskets={baskets}/>
-      <CreateBasketButton onCreateClick={addBasket()}/>
+      <CreateBasketButton onCreateClick={addBasket}/>
 
       <Routes>
         <Route path="/baskets/:id`" element={<BasketPage requests={requests}></BasketPage>}></Route>

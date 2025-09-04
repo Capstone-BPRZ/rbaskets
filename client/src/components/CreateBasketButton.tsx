@@ -1,7 +1,7 @@
-import type {Basket} from "../types";
+// import type {Basket} from "../types";
 
 interface CreateBasketButtonProps {
-  onCreateClick: () => Basket;
+  onCreateClick: () => Promise<void>;
 }
 
 const CreateBasketButton =
