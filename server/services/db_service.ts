@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 
 dotenv.config({ path: `${__dirname}/../.env` });
 
-mongoose.set('strictQuery', false)
+mongoose.set('strictQuery', false);
 
 const requestBodySchema = new mongoose.Schema({
   body: String,
@@ -64,6 +64,40 @@ async function createBasket(userId: user_id): Promise<BasketData | null> {
   }
 }
 
+async function selectAllBaskets(userId: user_id): Promise<BasketData[] | null> {
+  let client;
+  try {
+    client = await connectSQL();
+    const selectQuery = "SELECT id, user_id, basket_path FROM baskets WHERE user_id = $1";
+    const queryResult = await client.query<BasketData>(selectQuery, [userId]);
+    return queryResult.rows;
+  } catch (err) {
+    console.error(err);
+    return null;
+  } finally {
+    if (client) {
+      await client.end();
+    }
+  }
+}
+
+async function selectBasket(basketId: number): Promise<BasketData | null> {
+  let client;
+  try {
+    client = await connectSQL();
+    const selectQuery = "SELECT id, user_id, basket_path FROM baskets WHERE id = $1";
+    const queryResult = await client.query<BasketData>(selectQuery, [basketId]);
+    return queryResult.rows[0];
+  } catch (err) {
+    console.error(err);
+    return null;
+  } finally {
+    if (client) {
+      await client.end();
+    }
+  }
+}
+
 async function selectRequest(requestId: string): Promise<RequestData | null> {
   let client;
   try {
@@ -72,10 +106,10 @@ async function selectRequest(requestId: string): Promise<RequestData | null> {
     const queryResult = await client.query<RequestDB>(selectQuery, [requestId]);
     const pgRequest = queryResult.rows[0];
 
-    await mongoose.connect(process.env.MONGODB_URI as string)
+    await mongoose.connect(process.env.MONGODB_URI as string);
 
     const mongoResult = await RequestBody.findById(pgRequest.body_id);
-    const mongoBody = mongoResult?.body || ""
+    const mongoBody = mongoResult?.body || "";
 
     const fullRequest: RequestData = {
       id: pgRequest.id,
@@ -98,7 +132,7 @@ async function selectRequest(requestId: string): Promise<RequestData | null> {
   }
 }
 
-async function selectAllRequests(basketId: string): Promise<RequestData[] | null> {
+async function selectAllRequests(basketId: number): Promise<RequestData[] | null> {
   let client;
   try {
     client = await connectSQL();
@@ -106,15 +140,15 @@ async function selectAllRequests(basketId: string): Promise<RequestData[] | null
     const result = await client.query<RequestDB>(selectQuery, [basketId]);
     const pgRequests = result.rows;
 
-    await mongoose.connect(process.env.MONGODB_URI as string)
+    await mongoose.connect(process.env.MONGODB_URI as string);
 
     const mongoBodies = await Promise.allSettled(pgRequests.map(async pgRequest => {
-      return await RequestBody.findById(pgRequest.body_id)
-    }))
+      return await RequestBody.findById(pgRequest.body_id);
+    }));
 
     const resultBodies = mongoBodies.map(result => {
       return (result.status === "fulfilled") ? result.value?.body : "";
-    })
+    });
 
     const fullRequestList = pgRequests.map((pgRequest, idx) => {
       const fullRequest: RequestData = {
@@ -127,7 +161,7 @@ async function selectAllRequests(basketId: string): Promise<RequestData[] | null
       };
 
       return fullRequest;
-    })
+    });
 
     return fullRequestList;
 
@@ -142,7 +176,7 @@ async function selectAllRequests(basketId: string): Promise<RequestData[] | null
   }
 }
 
-async function addRequestToBasket(basketId: string, timestamp: Date, method: string, headers: string, body: string): Promise<RequestData | null> {
+async function addRequestToBasket(basketId: number, timestamp: Date, method: string, headers: string, body: string): Promise<RequestData | null> {
   let pgClient;
   try {
     await mongoose.connect(process.env.MONGODB_URI as string)
@@ -191,14 +225,13 @@ async function addRequestToBasket(basketId: string, timestamp: Date, method: str
   }
 }
 
-async function deleteBasket(basketId: string): Promise<string | null> {
+async function deleteBasket(basketId: number): Promise<number | null> {
   let client;
   try {
     client = await connectSQL();
     const selectQuery = "SELECT body_id FROM requests WHERE basket_id = $1";
     const result = await client.query<RequestDB>(selectQuery, [basketId]);
     const bodyIds = result.rows.map(row => row.body_id);
-    console.log('body id list:', bodyIds)
 
     const deleteQuery = "DELETE FROM baskets WHERE id = $1";
     await client.query<RequestDB>(deleteQuery, [basketId]);
@@ -219,6 +252,7 @@ async function deleteBasket(basketId: string): Promise<string | null> {
   }
 }
 
-export { selectRequest, selectAllRequests, createBasket, addRequestToBasket, deleteBasket, RequestBody };
-
-
+export { selectRequest, selectAllRequests,
+         selectBasket, selectAllBaskets,
+         createBasket, addRequestToBasket, deleteBasket,
+         RequestBody };

@@ -1,9 +1,17 @@
 // @ts-nocheck
 
-const BasketPage = ({ 
-  basket,
+import type {Request, Basket} from "../types";
+
+interface BasketPageProps {
+  currentBasket: Basket, 
+  requests: Request[],
+  request: Request,
+}
+
+const BasketPage: BasketPageProps = ({ 
   currentBasket,
-  requests, 
+  requests,
+  request, 
 }) => {
 
   function requestCreatedTime(request) {
@@ -33,7 +41,7 @@ const BasketPage = ({
           <span className="request-method">{request.method}</span>
           <span className="request-created-time">{requestCreatedTime(request)}</span>
           <span className="request-created-date">{requestCreatedDate(request)}</span>
-          <span className="basket-name-request-list">{currentBasket.basket_path}</span>
+          <span className="basket-name-request-list">{currentBasket.basket_path.slice(-8)}</span>
           <span className="request-headers">{request.headers}</span>
           </div>
         </li>
@@ -42,13 +50,24 @@ const BasketPage = ({
     )
   }
 
+  function displayHeader(currentBasket, requests) {
+    return (
+      <div className="basket-header">
+      <span className="basket-name-header">Basket: {currentBasket.basket_path.slice(-7)}</span>
+      <span className="request-count">Requests: {requests.length}</span>
+      <span>
+        <span className="requests-are-collected">Requests are collected at </span>
+        <span className="basket-path">{currentBasket.basket_path}</span>
+      </span>
+    </div>
+    )
+  }
+
   return (
     <>
-    <div className="basket-header">
-      <span className="basket-name-header">Basket: {currentBasket.basket_path}</span>
-      <span className="request-count">Requests: {requests.length}</span>
-    </div>
-    <div className="request"
+    {displayHeader(currentBasket, requests)}
+    {displayRequests(requests)}
     </>
   )
 }
+
