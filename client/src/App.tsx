@@ -11,7 +11,7 @@ function App() {
   const [baskets, setBaskets] = useState<Basket[]>([]);
   // const [isModalOpen, setModalOpen] = useState(false);
   // const [currentBasket, setCurrentBasket] = useState<Basket | null>(null);
-  // const [requests, setRequests] = useState<Request[]>([]);
+  const [requests, setRequests] = useState<Request[]>([]);
 
   const baseURL = 'http://localhost:3000';
 
@@ -32,7 +32,6 @@ function App() {
       console.error("Error fetching baskets:", error);
     }
   }
-
  
   // given a basket id (an integer formatted as a string) fetch all the requests belonging to a basket
   const fetchRequests = async (basketID: string) => {
@@ -49,19 +48,19 @@ function App() {
   }
 
   // given a basket id, return a basket
-  const fetchBasket = async (basketID: string) => {
-    try {
-      const response = await axios.get(`/api/baskets/${basketID}`)
-      setCurrentBasket(response.data);
-    } catch (error) {
-      console.error("Error fetching basket: ", error);
-    }
-  }
+  // const fetchBasket = async (basketID: string) => {
+  //   try {
+  //     const response = await axios.get(`/api/baskets/${basketID}`)
+  //     setCurrentBasket(response.data);
+  //   } catch (error) {
+  //     console.error("Error fetching basket: ", error);
+  //   }
+  // }
 
-  const deleteBasket = async (basket: Basket) => {
-    await axios.delete(`/api/baskets/${basket.id}`);
-    fetchBaskets();
-  }
+  // const deleteBasket = async (basket: Basket) => {
+  //   await axios.delete(`/api/baskets/${basket.id}`);
+  //   fetchBaskets();
+  // }
 
   // creates a basket and adds it to the database
   const addBasket = async () => {
@@ -76,7 +75,7 @@ function App() {
   return (
     <Router>
       <div>
-
+        <h1>rBaskets</h1>
       </div>
       <MyBasketsContainer baskets={baskets}/>
       <CreateBasketButton onCreateClick={addBasket}/>
