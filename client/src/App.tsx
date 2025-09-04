@@ -5,6 +5,7 @@ import type {Basket, Request} from "./types";
 import MyBasketsContainer from "./components/MyBasketsContainer.tsx";
 // import BasketPage from "./components/BasketPage.tsx";
 import CreateBasketButton from "./components/CreateBasketButton.tsx";
+import Modal from "./components/Modal.tsx";
 
 
 function App() {
@@ -47,16 +48,6 @@ function App() {
     }
   }
 
-  // given a basket id, return a basket
-  // const fetchBasket = async (basketID: string) => {
-  //   try {
-  //     const response = await axios.get(`/api/baskets/${basketID}`)
-  //     setCurrentBasket(response.data);
-  //   } catch (error) {
-  //     console.error("Error fetching basket: ", error);
-  //   }
-  // }
-
   // const deleteBasket = async (basket: Basket) => {
   //   await axios.delete(`/api/baskets/${basket.id}`);
   //   fetchBaskets();
@@ -67,10 +58,16 @@ function App() {
     try {
       const response = await axios.post(`${baseURL}/api/baskets/create`);
       setNewBasketPath(response.data.basket_path)
+      await fetchBaskets()
+      toggleModal()
       console.log(response.data)
     } catch (error) {
       console.error("Error creating basket: ", error);
     }
+  }
+
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
   }
 
   return (
