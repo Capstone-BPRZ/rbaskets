@@ -17,10 +17,9 @@ function App() {
   // fetch all the baskets that belong to a user
   const fetchBaskets = async () => {
     try {
-      const response = await axios.get<Response>(`${baseURL}/api/baskets`);
+      const response = await axios.get(`${baseURL}/api/baskets`);
       console.log(response)
-      const baskets = response.data.baskets;  // this needs to call baskets (b/c the response has tons of stuff
-      // in it, the data is what we want but how to Type the get method?
+      const baskets: Basket[] = response.data.baskets;
       setBaskets(baskets);
       console.log('baskets:', baskets);
     } catch (error) {
