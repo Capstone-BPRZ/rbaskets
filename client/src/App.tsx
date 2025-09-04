@@ -72,10 +72,7 @@ function App() {
     }
   }
 
-  const onBasketClick = (id:string) => {
-    // this is where the routing will go to the basket page
-    console.log(`you clicked basket id: ${id}`)
-  }
+
 
   return (
     <Router>
