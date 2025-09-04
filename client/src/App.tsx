@@ -61,6 +61,7 @@ function App() {
     fetchBaskets();
   }
 
+  // creates a basket and adds it to the database
   const addBasket = async () => {
     try {
       await axios.post(`/api/baskets`);
@@ -84,8 +85,9 @@ function App() {
         baskets={baskets}
         onBasketClick={onBasketClick}
       />
+
       <Routes>
-        <Route path={`baskets/:id`} element={<BasketPage requests={requests}></BasketPage>}></Route>
+        <Route path="/baskets/:id`" element={<BasketPage requests={requests}></BasketPage>}></Route>
       </Routes>
     </Router>
   )
