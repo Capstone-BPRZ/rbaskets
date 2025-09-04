@@ -3,7 +3,7 @@ import axios from "axios";
 import { BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 import type {Basket, Request} from "./types";
 import MyBasketsContainer from "./components/MyBasketsContainer.tsx";
-import BasketPage from "./components/BasketPage.tsx";
+import BasketPage from "./components/BasketPage";
 
 
 function App() {
@@ -28,6 +28,7 @@ function App() {
       const baskets = response.data.baskets;  // this needs to call baskets (b/c the response has tons of stuff
       // in it, the data is what we want but how to Type the get method?
       setBaskets(baskets);
+      setCurrentBasket(baskets[0] || null);
       console.log('baskets:', baskets);
     } catch (error) {
       console.error("Error fetching baskets:", error);
@@ -80,17 +81,23 @@ function App() {
 
   return (
     <Router>
-      <div>
+    <div>
+      <h1>rBaskets</h1>
+    </div>
+    <MyBasketsContainer baskets={baskets}/>
+    <CreateBasketButton onCreateClick={addBasket}/>
 
-      </div>
-      <MyBasketsContainer
-        baskets={baskets}
-        onBasketClick={onBasketClick}
-      />
-      <Routes>
-        <Route path={`baskets/:id`} element={<BasketPage requests={requests}></BasketPage>}></Route>
-      </Routes>
-    </Router>
+    <Routes>
+      {/*<Route path="/baskets/:id`" element={<BasketPage requests={requests}></BasketPage>}></Route>*/}
+    </Routes>
+  </Router>
+    // <div>
+    //   <BasketPage
+    //     currentBasket={currentBasket}
+    //     requests={requests}
+    //     request={currentRequest}
+    //   />
+    // </div>
   )
 }
 

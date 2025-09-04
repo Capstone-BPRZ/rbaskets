@@ -3,15 +3,15 @@
 import type {Request, Basket} from "../types";
 
 interface BasketPageProps {
-  currentBasket: Basket, 
-  requests: Request[],
-  request: Request,
+  currentBasket: Basket; 
+  requests: Request[];
+  request: Request;
 }
 
-const BasketPage: BasketPageProps = ({ 
+const BasketPage: React.FC<BasketPageProps> = ({ 
   currentBasket,
   requests,
-  request, 
+  request
 }) => {
 
   function requestCreatedTime(request) {
