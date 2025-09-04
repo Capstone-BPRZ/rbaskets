@@ -1,5 +1,3 @@
-// import type {Basket} from "../types";
-
 interface CreateBasketButtonProps {
   onCreateClick: () => Promise<void>;
 }
@@ -8,13 +6,14 @@ const CreateBasketButton =
   ({ onCreateClick }: CreateBasketButtonProps) => {
 
   return (
-    <img
+    <>
+      <h2>Create a New Basket</h2><img
       src="/src/assets/basket-cat.png"
       height="375"
       width="250"
       alt="create"
-      onClick={onCreateClick}
-    />
+      onClick={onCreateClick}/>
+    </>
   )
 }
 
