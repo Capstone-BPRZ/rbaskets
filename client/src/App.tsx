@@ -9,9 +9,7 @@ import CreateBasketButton from "./components/CreateBasketButton.tsx";
 
 function App() {
   const [baskets, setBaskets] = useState<Basket[]>([]);
-  // const [isModalOpen, setModalOpen] = useState(false);
-  // const [currentBasket, setCurrentBasket] = useState<Basket | null>(null);
-  const [currentBasket, setCurrentBasket] = useState<Basket | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [newBasketPath, setNewBasketPath] = useState<string | null>(null);
   const [requests, setRequests] = useState<Request[]>([]);
 
