@@ -74,16 +74,7 @@ function App() {
   }
 
   return (
-
-  </Router>
-    // <div>
-    //   <BasketPage
-    //     currentBasket={currentBasket}
-    //     requests={requests}
-    //     request={currentRequest}
-    //   />
-    // </div>
-
+    <Router>
       <div>
         <h1>rBaskets</h1>
       </div>
@@ -95,7 +86,6 @@ function App() {
         {/*<Route path="/baskets/:id`" element={<BasketPage requests={requests}></BasketPage>}></Route>*/}
       </Routes>
     </Router>
-
   )
 }
 
