@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import axios from "axios";
 import { BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 import type {Basket, Request} from "./types";
-import MyBasketsContainer from "./components/MyBasketsContainer.tsx";
-import BasketPage from "./components/BasketPage.tsx";
+import MyBasketsContainer from "./components/MyBasketsContainer";
+import BasketPage from "./components/BasketPage";
 
 
 function App() {
