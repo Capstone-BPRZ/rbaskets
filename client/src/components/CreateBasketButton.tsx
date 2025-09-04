@@ -9,7 +9,9 @@ const CreateBasketButton =
 
   return (
     <img
-      src="../assets/basket-cat.png"
+      src="/src/assets/basket-cat.png"
+      height="375"
+      width="250"
       alt="create"
       onClick={onCreateClick}
     />
