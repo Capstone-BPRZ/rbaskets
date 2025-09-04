@@ -17,7 +17,7 @@ const MyBasketsContainer = ({baskets}: MyBasketsContainerProps) => {
             return (
               <tr key={basket.id}>
                 <td className='basket_list_item'>
-                  <Link to={`/baskets/${basket.id}`}>{basket.basket_path}</Link>
+                  <Link to={`/baskets/${basket.basket_path}`}>{basket.basket_path}</Link>
                 </td>
               </tr>
             )

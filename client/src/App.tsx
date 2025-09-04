@@ -11,6 +11,7 @@ function App() {
   const [baskets, setBaskets] = useState<Basket[]>([]);
   // const [isModalOpen, setModalOpen] = useState(false);
   // const [currentBasket, setCurrentBasket] = useState<Basket | null>(null);
+  const [currentBasket, setCurrentBasket] = useState<Basket | null>(null);
   const [requests, setRequests] = useState<Request[]>([]);
 
   const baseURL = 'http://localhost:3000';
@@ -65,8 +66,9 @@ function App() {
   // creates a basket and adds it to the database
   const addBasket = async () => {
     try {
-      await axios.post(`${baseURL}/api/baskets/create`);
-      fetchBaskets();
+      const response = await axios.post(`${baseURL}/api/baskets/create`);
+      setCurrentBasket(response.data)
+      console.log(response.data)
     } catch (error) {
       console.error("Error creating basket: ", error);
     }
