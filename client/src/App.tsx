@@ -1,46 +1,53 @@
 import { useState, useEffect } from 'react';
 import axios from "axios";
+import { BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 import type {Basket, Request} from "./types";
+import MyBasketsContainer from "./components/MyBasketsContainer.tsx";
+import BasketPage from "./components/BasketPage.tsx";
 
 
 function App() {
   const [baskets, setBaskets] = useState<Basket[]>([]);
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [currentBasket, setCurrentBasket] = useState<Basket | null>(null);
+  // const [isModalOpen, setModalOpen] = useState(false);
+  // const [currentBasket, setCurrentBasket] = useState<Basket | null>(null);
   const [requests, setRequests] = useState<Request[]>([]);
 
   const baseURL = 'http://localhost:3000';
 
-
+  // fetch all the baskets that belong to a user
   const fetchBaskets = async () => {
     try {
-      const response = await axios.get<Basket[]>(`${baseURL}/api/baskets`);
-      const data = response.data;
-      setBaskets(data.baskets);
-      console.log('baskets:', response.data);
+      const response = await axios.get<Response>(`${baseURL}/api/baskets`);
+      console.log(response)
+      const baskets = response.data.baskets;  // this needs to call baskets (b/c the response has tons of stuff
+      // in it, the data is what we want but how to Type the get method?
+      setBaskets(baskets);
+      console.log('baskets:', baskets);
     } catch (error) {
       console.error("Error fetching baskets:", error);
     }
   }
 
   useEffect(() => {
-    // fetchBaskets();
-      fetchRequests('1');
+    fetchBaskets();
+    fetchRequests('1'); // for testing right now
   }, []);
 
+  // given a basket id (an integer formatted as a string) fetch all the requests belonging to a basket
   const fetchRequests = async (basketID: string) => {
     try {
       const response = await axios.get(
         `${baseURL}/api/baskets/${basketID}/requests`
       );
-      const data = response.data
-      setRequests(data.requests);
-      console.log(`requests for basket ${basketID}:`, response.data);
+      const requestsData = response.data.requests
+      setRequests(requestsData);
+      console.log(`requests for basket ${basketID}:`, requestsData);
     } catch (e) {
       console.log(e)
     }
   }
 
+  // given a basket id, return a basket
   const fetchBasket = async (basketID: string) => {
     try {
       const response = await axios.get(`/api/baskets/${basketID}`)
@@ -64,11 +71,24 @@ function App() {
     }
   }
 
+  const onBasketClick = (id:string) => {
+    // this is where the routing will go to the basket page
+    console.log(`you clicked basket id: ${id}`)
+  }
 
   return (
-    <>
-      Živeli!
-    </>
+    <Router>
+      <div>
+
+      </div>
+      <MyBasketsContainer
+        baskets={baskets}
+        onBasketClick={onBasketClick}
+      />
+      <Routes>
+        <Route path={`baskets/:id`} element={<BasketPage requests={requests}></BasketPage>}></Route>
+      </Routes>
+    </Router>
   )
 }
 
