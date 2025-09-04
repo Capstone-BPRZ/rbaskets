@@ -3,8 +3,10 @@ import axios from "axios";
 import { BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 import type {Basket, Request} from "./types";
 import MyBasketsContainer from "./components/MyBasketsContainer.tsx";
-// import BasketPage from "./components/BasketPage.tsx";
+
+import BasketPage from "./components/BasketPage";
 import CreateBasketButton from "./components/CreateBasketButton.tsx";
+
 
 
 function App() {
@@ -28,6 +30,7 @@ function App() {
       console.log(response)
       const baskets: Basket[] = response.data.baskets;
       setBaskets(baskets);
+      setCurrentBasket(baskets[0] || null);
       console.log('baskets:', baskets);
     } catch (error) {
       console.error("Error fetching baskets:", error);
@@ -75,7 +78,16 @@ function App() {
   }
 
   return (
-    <Router>
+
+  </Router>
+    // <div>
+    //   <BasketPage
+    //     currentBasket={currentBasket}
+    //     requests={requests}
+    //     request={currentRequest}
+    //   />
+    // </div>
+
       <div>
         <h1>rBaskets</h1>
       </div>
@@ -86,6 +98,7 @@ function App() {
         {/*<Route path="/baskets/:id`" element={<BasketPage requests={requests}></BasketPage>}></Route>*/}
       </Routes>
     </Router>
+
   )
 }
 
