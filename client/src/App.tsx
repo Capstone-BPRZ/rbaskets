@@ -6,14 +6,14 @@ import MyBasketsContainer from "./components/MyBasketsContainer.tsx";
 
 import BasketPage from "./components/BasketPage";
 import CreateBasketButton from "./components/CreateBasketButton.tsx";
+import Modal from "./components/Modal.tsx";
 
 
 
 function App() {
   const [baskets, setBaskets] = useState<Basket[]>([]);
-  // const [isModalOpen, setModalOpen] = useState(false);
-  // const [currentBasket, setCurrentBasket] = useState<Basket | null>(null);
-  const [currentBasket, setCurrentBasket] = useState<Basket | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newBasketPath, setNewBasketPath] = useState<string | null>(null);
   const [requests, setRequests] = useState<Request[]>([]);
 
   const baseURL = 'http://localhost:3000';
@@ -51,16 +51,6 @@ function App() {
     }
   }
 
-  // given a basket id, return a basket
-  // const fetchBasket = async (basketID: string) => {
-  //   try {
-  //     const response = await axios.get(`/api/baskets/${basketID}`)
-  //     setCurrentBasket(response.data);
-  //   } catch (error) {
-  //     console.error("Error fetching basket: ", error);
-  //   }
-  // }
-
   // const deleteBasket = async (basket: Basket) => {
   //   await axios.delete(`/api/baskets/${basket.id}`);
   //   fetchBaskets();
@@ -70,11 +60,17 @@ function App() {
   const addBasket = async () => {
     try {
       const response = await axios.post(`${baseURL}/api/baskets/create`);
-      setCurrentBasket(response.data)
+      setNewBasketPath(response.data.basket_path)
+      await fetchBaskets()
+      toggleModal()
       console.log(response.data)
     } catch (error) {
       console.error("Error creating basket: ", error);
     }
+  }
+
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
   }
 
   return (
@@ -91,6 +87,7 @@ function App() {
       <div>
         <h1>rBaskets</h1>
       </div>
+      <Modal handleToggle={toggleModal} isModalOpen={isModalOpen} newBasketPath={newBasketPath}></Modal>
       <MyBasketsContainer baskets={baskets}/>
       <CreateBasketButton onCreateClick={addBasket}/>
 
