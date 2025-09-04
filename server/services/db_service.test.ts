@@ -6,13 +6,13 @@ import mongoose from 'mongoose';
 mongoose.set('strictQuery', false)
 
 test('adds a request to the appropriate databases', async () => {
-  const myRequest: RequestData | null = await addRequestToBasket(1, new Date(), 'GET', 'some headers', 'some body');
+  const myRequest: RequestData | null = await addRequestToBasket('abcdefg', new Date(), 'GET', 'some headers', 'some body');
   expect(myRequest?.headers).toBe('some headers');
 });
 
 test('gets an individual basket', async () => {
-  const myRequest: BasketData | null = await selectBasket(1);
-  expect(myRequest?.basket_path).toBe('abcdefg');
+  const myRequest: BasketData | null = await selectBasket('abcdefg');
+  expect(myRequest?.id).toBe(1);
 });
 
 test('gets all baskets', async () => {
@@ -41,7 +41,7 @@ test('gets body data from Mongo during select', async () => {
 });
 
 test('gets body data from Mongo during selectAll', async () => {
-  const myRequest: RequestData[] | null = await selectAllRequests(1);
+  const myRequest: RequestData[] | null = await selectAllRequests('abcdefg');
   expect(myRequest?.map(request => request.body)).toContain('some body');
 });
 
@@ -50,14 +50,15 @@ test('deleting a basket deletes its requests and mongo bodies', async() => {
 
   if (!newBasket) return;
 
+  const basketPath = newBasket.basket_path
   const basketId = newBasket.id
 
-  await addRequestToBasket(basketId, new Date(), 'GET', 'delete test headers', `delete test body for ${basketId}`);
+  await addRequestToBasket(basketPath, new Date(), 'GET', 'delete test headers', `delete test body for ${basketPath}`);
 
-  const queryResults = await selectAllRequests(basketId);
-  expect(queryResults?.map(request => request.body)).toContain(`delete test body for ${basketId}`);
+  const queryResults = await selectAllRequests(basketPath);
+  expect(queryResults?.map(request => request.body)).toContain(`delete test body for ${basketPath}`);
 
-  await deleteBasket(basketId);
+  await deleteBasket(basketPath);
 
   const client = new Client({
       user: process.env.DB_USER,
@@ -82,7 +83,7 @@ test('deleting a basket deletes its requests and mongo bodies', async() => {
 
   await mongoose.connect(process.env.MONGODB_URI as string)
 
-  const mongoBodyResult = await RequestBody.find({body: `delete test body for ${basketId}`})
+  const mongoBodyResult = await RequestBody.find({body: `delete test body for ${basketPath}`})
     .exec()
   expect(mongoBodyResult.length).toBe(0)
 
