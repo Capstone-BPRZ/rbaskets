@@ -18,7 +18,6 @@ function App() {
   useEffect(() => {
     fetchBaskets();
     fetchRequests('1');
-    console.log('baskets:', baskets);
   }, []);
 
   // fetch all the baskets that belong to a user
@@ -56,16 +55,7 @@ function App() {
       const response = await axios.get(`/api/baskets/${basketID}`)
       setCurrentBasket(response.data);
     } catch (error) {
-      console.error("Error fetching requests:", error);
-    }
-  }
-
-  const fetchRequest = async (basket: Basket, request: Request) => {
-    try {
-      const response = await axios.get<Request>(`/api/baskets/${basket.id}/requests/${request.id}`)
-      setCurrentRequest(response.data);
-    } catch (error) {
-      console.error("Error fetching request:", error);
+      console.error("Error fetching basket: ", error);
     }
   }
 
@@ -79,7 +69,7 @@ function App() {
       await axios.post(`/api/baskets/create`);
       fetchBaskets();
     } catch (error) {
-      console.error("Error creating basket:", error);
+      console.error("Error creating basket: ", error);
     }
   }
 

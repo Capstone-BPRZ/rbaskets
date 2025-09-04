@@ -71,3 +71,4 @@ const BasketPage: BasketPageProps = ({
   )
 }
 
+export default BasketPage;
