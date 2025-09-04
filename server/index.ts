@@ -97,7 +97,7 @@ app.get('/api/baskets/:basketId', async (req: Request, res:Response) => {
 
 
 
- app.get('/api/baskets/:basket/requests', async (req: Request, res: Response) => {
+ app.get('/api/baskets/:basketId/requests', async (req: Request, res: Response) => {
       try {
          const basketId = parseInt(req.params.basketId, 10); ;
          const requests: RequestData[] | null = await selectAllRequests(basketId);
@@ -115,9 +115,9 @@ app.get('/api/baskets/:basketId', async (req: Request, res:Response) => {
 
 
 
-    app.get('/api/baskets/:basket/requests/:request',  async (req: Request, res: Response) => {
+    app.get('/api/baskets/:basketId/requests/:requestId',  async (req: Request, res: Response) => {
       try {
-        const requestId = req.params.request;
+        const requestId = req.params.requestId;
 
         if (!requestId) {
           return res.status(400).json({error: "missing requestId"});
