@@ -81,12 +81,12 @@ async function selectAllBaskets(userId: user_id): Promise<BasketData[] | null> {
   }
 }
 
-async function selectBasket(basketId: number): Promise<BasketData | null> {
+async function selectBasket(basketPath: string): Promise<BasketData | null> {
   let client;
   try {
     client = await connectSQL();
-    const selectQuery = "SELECT id, user_id, basket_path FROM baskets WHERE id = $1";
-    const queryResult = await client.query<BasketData>(selectQuery, [basketId]);
+    const selectQuery = "SELECT id, user_id, basket_path FROM baskets WHERE basket_path = $1";
+    const queryResult = await client.query<BasketData>(selectQuery, [basketPath]);
     return queryResult.rows[0];
   } catch (err) {
     console.error(err);
@@ -132,12 +132,15 @@ async function selectRequest(requestId: string): Promise<RequestData | null> {
   }
 }
 
-async function selectAllRequests(basketId: number): Promise<RequestData[] | null> {
+async function selectAllRequests(basketPath: string): Promise<RequestData[] | null> {
   let client;
   try {
     client = await connectSQL();
-    const selectQuery = "SELECT id, received, method, headers, body_id, basket_id FROM requests WHERE basket_id = $1";
-    const result = await client.query<RequestDB>(selectQuery, [basketId]);
+    const selectQuery = "SELECT requests.id, received, method, headers, body_id, basket_id " +
+                        "FROM requests " +
+                        "JOIN baskets ON requests.basket_id = baskets.id " +
+                        "WHERE basket_path = $1";
+    const result = await client.query<RequestDB>(selectQuery, [basketPath]);
     const pgRequests = result.rows;
 
     await mongoose.connect(process.env.MONGODB_URI as string);
@@ -176,7 +179,24 @@ async function selectAllRequests(basketId: number): Promise<RequestData[] | null
   }
 }
 
-async function addRequestToBasket(basketId: number, timestamp: Date, method: string, headers: string, body: string): Promise<RequestData | null> {
+async function basketIdFromPath(basketPath: string) {
+  let pgClient;
+  try {
+    pgClient = await connectSQL();
+    const getBasketIdStatement = "SELECT id FROM baskets WHERE basket_path = $1"
+    const basketIdResult = await pgClient.query(getBasketIdStatement, [basketPath])
+    return basketIdResult.rows[0]?.id
+  } catch (err) {
+    console.error(err);
+    return null;
+  } finally {
+    if (pgClient) {
+      await pgClient.end();
+    }
+  }
+}
+
+async function addRequestToBasket(basketPath: string, timestamp: Date, method: string, headers: string, body: string): Promise<RequestData | null> {
   let pgClient;
   try {
     await mongoose.connect(process.env.MONGODB_URI as string)
@@ -190,6 +210,8 @@ async function addRequestToBasket(basketId: number, timestamp: Date, method: str
     const mongoId = String(mongoResult.id);
 
     pgClient = await connectSQL();
+
+    const basketId = await basketIdFromPath(basketPath);
 
     await pgClient.query('BEGIN');
 
@@ -225,10 +247,13 @@ async function addRequestToBasket(basketId: number, timestamp: Date, method: str
   }
 }
 
-async function deleteBasket(basketId: number): Promise<number | null> {
+async function deleteBasket(basketPath: string): Promise<number | null> {
   let client;
   try {
     client = await connectSQL();
+
+    const basketId = await basketIdFromPath(basketPath);
+
     const selectQuery = "SELECT body_id FROM requests WHERE basket_id = $1";
     const result = await client.query<RequestDB>(selectQuery, [basketId]);
     const bodyIds = result.rows.map(row => row.body_id);
