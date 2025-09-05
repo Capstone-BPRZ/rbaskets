@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import path from 'path'; 
 import { selectBasket, selectAllBaskets, selectRequest, selectAllRequests, createBasket, addRequestToBasket, deleteBasket } from './services/db_service';
 import { RequestData, BasketData } from './types';
 
@@ -11,6 +12,8 @@ const userId = 1;
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+
+app.use(express.static(path.join(__dirname, '../client/dist'))); // this serves the backend to the frontend on npm run build 
 app.use(cors());
 
 app.get('/', (_req: Request, res: Response) => {
