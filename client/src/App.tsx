@@ -18,7 +18,6 @@ function App() {
   const [newBasketPath, setNewBasketPath] = useState<string | null>(null);
   const [currentBasket, setCurrentBasket] = useState<Basket | null>(null);
   const [requests, setRequests] = useState<Request[]>([]);
-  const [currentBasket, setCurrentBasket] = useState<Basket>(null);
 
   const baseURL = 'http://localhost:3000';
 
@@ -44,7 +43,7 @@ function App() {
   const fetchRequests = async (currentBasket: string) => {
     try {
       const response = await axios.get(
-        `${baseURL}/api/baskets/${currentBasket.basket_path}/requests`
+        `${baseURL}/api/baskets/${currentBasket}/requests`
       );
       const requestsData = response.data.requests
       setRequests(requestsData);
@@ -106,7 +105,7 @@ function App() {
         onDeleteBasket={deleteBasket}
         onSelectBasket={(basket: Basket) => {
           setCurrentBasket(basket);
-          fetchRequests(basket.id);
+          fetchRequests(basket.basket_path);
         }}
       />
 
