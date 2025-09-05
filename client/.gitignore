@@ -1,4 +1,13 @@
 # Logs
+
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 logs
 *.log
 npm-debug.log*
