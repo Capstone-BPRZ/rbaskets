@@ -48,6 +48,7 @@ const BasketPage: React.FC<BasketPageProps> = ({
           <span className="request-created-date">{requestCreatedDate(request)}</span>
           <span className="basket-name-request-list">{currentBasket.basket_path.slice(-8)}</span>
           <span className="request-headers">{request.headers}</span>
+          <span className="request-body">{request.body}</span>
           </div>
         </li>
         )
