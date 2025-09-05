@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 import type {Basket, Request} from "./types";
 import MyBasketsContainer from "./components/MyBasketsContainer.tsx";
 
+
 import BasketPage from "./components/BasketPage";
 import CreateBasketButton from "./components/CreateBasketButton.tsx";
 import Modal from "./components/Modal.tsx";
@@ -49,10 +50,23 @@ function App() {
     }
   }
 
-  // const deleteBasket = async (basket: Basket) => {
-  //   await axios.delete(`/api/baskets/${basket.id}`);
-  //   fetchBaskets();
-  // }
+  // delete a specific basket
+  const deleteBasket = async (basket: Basket) => {
+    try {
+      if (!window.confirm(`Are you sure you want to delete basket "${basket.basket_path}"? This action cannot be undone.`)) {
+        return;
+      }
+      
+      await axios.delete(`${baseURL}/api/baskets/${basket.basket_path}`);
+      
+      setBaskets(prevBaskets => prevBaskets.filter(b => b.id !== basket.id));
+      
+      console.log(`Successfully deleted basket: ${basket.basket_path}`);
+    } catch (error) {
+      console.error("Error deleting basket: ", error);
+      alert("Failed to delete basket. Please try again.");
+    }
+  }
 
   // creates a basket and adds it to the database
   const addBasket = async () => {
@@ -77,7 +91,7 @@ function App() {
         <h1>rBaskets</h1>
       </div>
       <Modal handleToggle={toggleModal} isModalOpen={isModalOpen} newBasketPath={newBasketPath}></Modal>
-      <MyBasketsContainer baskets={baskets}/>
+      <MyBasketsContainer baskets={baskets} onDeleteBasket={deleteBasket}/>
       <CreateBasketButton onCreateClick={addBasket}/>
       <Routes>
         {/*<Route path="/baskets/:id`" element={<BasketPage requests={requests}></BasketPage>}></Route>*/}
