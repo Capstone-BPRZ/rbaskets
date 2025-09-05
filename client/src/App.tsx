@@ -3,6 +3,7 @@ import axios from "axios";
 import { BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 import type {Basket, Request} from "./types";
 import MyBasketsContainer from "./components/MyBasketsContainer.tsx";
+import { useNavigate } from "react-router-dom";
 
 
 import BasketPage from "./components/BasketPage";
@@ -15,6 +16,7 @@ function App() {
   const [baskets, setBaskets] = useState<Basket[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newBasketPath, setNewBasketPath] = useState<string | null>(null);
+  const [currentBasket, setCurrentBasket] = useState<Basket | null>(null);
   const [requests, setRequests] = useState<Request[]>([]);
 
   const baseURL = 'http://localhost:3000';
@@ -90,14 +92,42 @@ function App() {
       <div>
         <h1>rBaskets</h1>
       </div>
-      <Modal handleToggle={toggleModal} isModalOpen={isModalOpen} newBasketPath={newBasketPath}></Modal>
-      <MyBasketsContainer baskets={baskets} onDeleteBasket={deleteBasket}/>
-      <CreateBasketButton onCreateClick={addBasket}/>
+
+      <Modal
+        handleToggle={toggleModal}
+        isModalOpen={isModalOpen}
+        newBasketPath={newBasketPath}
+      />
+
+      <MyBasketsContainer
+        baskets={baskets}
+        onDeleteBasket={deleteBasket}
+        onSelectBasket={(basket: Basket) => {
+          setCurrentBasket(basket);
+          fetchRequests(basket.id);
+        }}
+      />
+
+      <CreateBasketButton onCreateClick={addBasket} />
+
       <Routes>
-        {/*<Route path="/baskets/:id`" element={<BasketPage requests={requests}></BasketPage>}></Route>*/}
+        <Route
+          path="/baskets/:id"
+          element={
+            currentBasket ? (
+              <BasketPage
+                currentBasket={currentBasket}
+                requests={requests}
+                fetchRequests= {fetchRequests}
+              />
+            ) : (
+              <div>Select a basket to view requests</div>
+            )
+          }
+        />
       </Routes>
     </Router>
-  )
+  );
 }
 
 export default App;
