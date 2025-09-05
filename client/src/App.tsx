@@ -13,7 +13,6 @@ function App() {
   const [baskets, setBaskets] = useState<Basket[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newBasketPath, setNewBasketPath] = useState<string | null>(null);
-  const [currentBasket, setCurrentBasket] = useState<Basket | null>(null);
   const [requests, setRequests] = useState<Request[]>([]);
 
   const baseURL = 'http://localhost:3000';
@@ -29,7 +28,6 @@ function App() {
       console.log(response)
       const baskets: Basket[] = response.data.baskets;
       setBaskets(baskets);
-      setCurrentBasket(baskets[0]);
       console.log('baskets:', baskets);
     } catch (error) {
       console.error("Error fetching baskets:", error);
@@ -87,44 +85,28 @@ function App() {
 
   return (
     <Router>
-      <div>
-        <h1>rBaskets</h1>
-      </div>
-
-      <Modal
-        handleToggle={toggleModal}
-        isModalOpen={isModalOpen}
-        newBasketPath={newBasketPath}
-      />
-
-      <MyBasketsContainer
-        baskets={baskets}
-        onDeleteBasket={deleteBasket}
-        onSelectBasket={(basket: Basket) => {
-          setCurrentBasket(basket);
-          fetchRequests(basket.basket_path);
-        }}
-      />
-
-      <CreateBasketButton onCreateClick={addBasket} />
-
-      <Routes>
-        <Route
-          path="/baskets/:id"
-          element={
-            currentBasket ? (
-              <BasketPage
-                currentBasket={currentBasket}
-                requests={requests}
-                fetchRequests= {fetchRequests}
-              />
-            ) : (
-              <div>Select a basket to view requests</div>
-            )
-          }
-        />
-      </Routes>
-    </Router>
+    <div>
+      <h1>rBaskets</h1>
+    </div>
+  
+    <Modal
+      handleToggle={toggleModal}
+      isModalOpen={isModalOpen}
+      newBasketPath={newBasketPath}
+    />
+  
+    <MyBasketsContainer
+      baskets={baskets}
+      onDeleteBasket={deleteBasket}
+      // Just link to basket pages
+    />
+  
+    <CreateBasketButton onCreateClick={addBasket} />
+  
+    <Routes>
+    <Route path="/baskets/:basket_path" element={<BasketPage requests={requests} fetchRequests={fetchRequests} />} />
+    </Routes>
+  </Router>
   );
 }
 
