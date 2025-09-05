@@ -3,9 +3,6 @@ import axios from "axios";
 import { BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 import type {Basket, Request} from "./types";
 import MyBasketsContainer from "./components/MyBasketsContainer.tsx";
-import { useNavigate } from "react-router-dom";
-
-
 import BasketPage from "./components/BasketPage";
 import CreateBasketButton from "./components/CreateBasketButton.tsx";
 import Modal from "./components/Modal.tsx";
