@@ -3,8 +3,6 @@ import axios from "axios";
 import { BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 import type {Basket, Request} from "./types";
 import MyBasketsContainer from "./components/MyBasketsContainer.tsx";
-
-
 import BasketPage from "./components/BasketPage";
 import CreateBasketButton from "./components/CreateBasketButton.tsx";
 import Modal from "./components/Modal.tsx";
@@ -15,6 +13,7 @@ function App() {
   const [baskets, setBaskets] = useState<Basket[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newBasketPath, setNewBasketPath] = useState<string | null>(null);
+  const [currentBasket, setCurrentBasket] = useState<Basket | null>(null);
   const [requests, setRequests] = useState<Request[]>([]);
 
   const baseURL = 'http://localhost:3000';
@@ -30,6 +29,7 @@ function App() {
       console.log(response)
       const baskets: Basket[] = response.data.baskets;
       setBaskets(baskets);
+      setCurrentBasket(baskets[0]);
       console.log('baskets:', baskets);
     } catch (error) {
       console.error("Error fetching baskets:", error);
@@ -37,14 +37,14 @@ function App() {
   }
  
   // given a basket id (an integer formatted as a string) fetch all the requests belonging to a basket
-  const fetchRequests = async (basketID: string) => {
+  const fetchRequests = async (currentBasket: string) => {
     try {
       const response = await axios.get(
-        `${baseURL}/api/baskets/${basketID}/requests`
+        `${baseURL}/api/baskets/${currentBasket}/requests`
       );
       const requestsData = response.data.requests
       setRequests(requestsData);
-      console.log(`requests for basket ${basketID}:`, requestsData);
+      console.log(`requests for basket ${currentBasket}:`, requestsData);
     } catch (e) {
       console.log(e)
     }
@@ -100,10 +100,25 @@ function App() {
             <MyBasketsContainer baskets={baskets} onDeleteBasket={deleteBasket}/>
             <CreateBasketButton onCreateClick={addBasket}/></>
         }></Route>
-        {/*<Route path="/baskets/:id`" element={<BasketPage requests={requests}></BasketPage>}></Route>*/}
+        <Route
+          path="/baskets/:id"
+          element={
+            currentBasket ? (
+              <BasketPage
+                currentBasket={currentBasket}
+                requests={requests}
+                fetchRequests= {fetchRequests}
+              />
+            ) : (
+              <div>Select a basket to view requests</div>
+            )
+          }
+        />
       </Routes>
     </Router>
-  )
+  );
 }
 
 export default App;
+
+
