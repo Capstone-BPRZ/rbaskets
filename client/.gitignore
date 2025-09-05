@@ -1,7 +1,6 @@
 # Logs
 
-.vscode/*
-!.vscode/extensions.json
+**/.vscode/*
 .DS_Store
 *.suo
 *.ntvs*
