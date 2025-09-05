@@ -107,6 +107,7 @@ function App() {
     <Route path="/baskets/:basket_path" element={<BasketPage requests={requests} fetchRequests={fetchRequests} />} />
     </Routes>
   </Router>
+
   );
 }
 
