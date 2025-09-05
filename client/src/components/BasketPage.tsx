@@ -1,5 +1,6 @@
 // @ts-nocheck
 
+import { useEffect } from "react";
 import type {Request, Basket} from "../types";
 
 interface BasketPageProps {
@@ -10,7 +11,13 @@ interface BasketPageProps {
 const BasketPage: React.FC<BasketPageProps> = ({ 
   currentBasket,
   requests,
+  request,
+  fetchRequests
 }) => {
+
+  useEffect(() => {
+    fetchRequests(currentBasket.basket_path);
+  }, []);
 
   function requestCreatedTime(request) {
     const date = new Date(request.received);
@@ -41,7 +48,6 @@ const BasketPage: React.FC<BasketPageProps> = ({
           <span className="request-created-date">{requestCreatedDate(request)}</span>
           <span className="basket-name-request-list">{currentBasket.basket_path.slice(-8)}</span>
           <span className="request-headers">{request.headers}</span>
-          <span className="request-body">{request.body}</span>
           </div>
         </li>
         )

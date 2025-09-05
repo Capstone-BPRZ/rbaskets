@@ -1,4 +1,5 @@
 import {Link} from "react-router-dom";
+import gif from "../assets/jokic.gif"
 
 interface ModalProps {
   handleToggle: () => void,
@@ -19,8 +20,9 @@ const Modal = ({handleToggle, isModalOpen, newBasketPath}: ModalProps) => {
            onClick={(e) => e.stopPropagation()}
            style={{display: isModalOpen ? 'block' : 'none'}}
       >
-        <h1>Success</h1>
-        <p>New Basket {newBasketPath} is created</p>
+        <h1>Bucket!</h1>
+        <img src={gif} alt="Jokic celebration" className="modal-gif"></img>
+        <p>New Basket {newBasketPath} has been created</p>
         <button type='button' onClick={handleToggle}>Close</button>
         <button type='button'>
           <Link to={`/baskets/${newBasketPath}`}>Open Basket</Link>
