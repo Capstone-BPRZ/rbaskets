@@ -90,17 +90,6 @@ function App() {
   }
 
   return (
-
-  //   <div>
-  // {currentBasket ? (
-  //   <BasketPage
-  //     currentBasket={currentBasket}
-  //     requests={requests}
-  //   />
-  // ) : (
-  //   <p>Loading basket...</p>
-  // )}
-  // </div>
     <Router>
       <div>
         <h1>rBaskets</h1>
