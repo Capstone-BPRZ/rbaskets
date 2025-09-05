@@ -87,28 +87,19 @@ function App() {
 
   return (
     <Router>
-      <div>
-        <h1>rBaskets</h1>
-      </div>
-
-      <Modal
-        handleToggle={toggleModal}
-        isModalOpen={isModalOpen}
-        newBasketPath={newBasketPath}
-      />
-
-      <MyBasketsContainer
-        baskets={baskets}
-        onDeleteBasket={deleteBasket}
-        onSelectBasket={(basket: Basket) => {
-          setCurrentBasket(basket);
-          fetchRequests(basket.basket_path);
-        }}
-      />
-
-      <CreateBasketButton onCreateClick={addBasket} />
-
       <Routes>
+        <Route path='/' element={
+          <>
+            <div>
+              <h1>rBaskets</h1>
+            </div>
+            <Modal handleToggle={toggleModal}
+                   isModalOpen={isModalOpen}
+                   newBasketPath={newBasketPath}>
+            </Modal>
+            <MyBasketsContainer baskets={baskets} onDeleteBasket={deleteBasket}/>
+            <CreateBasketButton onCreateClick={addBasket}/></>
+        }></Route>
         <Route
           path="/baskets/:id"
           element={
