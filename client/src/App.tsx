@@ -15,7 +15,7 @@ function App() {
   const [newBasketPath, setNewBasketPath] = useState<string | null>(null);
   const [requests, setRequests] = useState<Request[]>([]);
 
-  const baseURL = 'http://localhost:3000';
+  const baseURL = '';
 
   useEffect(() => {
     fetchBaskets();
@@ -33,7 +33,7 @@ function App() {
       console.error("Error fetching baskets:", error);
     }
   }
- 
+
   // given a basket id (an integer formatted as a string) fetch all the requests belonging to a basket
   const fetchRequests = async (currentBasket: string) => {
     try {
@@ -54,11 +54,11 @@ function App() {
       if (!window.confirm(`Are you sure you want to delete basket "${basket.basket_path}"? This action cannot be undone.`)) {
         return;
       }
-      
+
       await axios.delete(`${baseURL}/api/baskets/${basket.basket_path}`);
-      
+
       setBaskets(prevBaskets => prevBaskets.filter(b => b.id !== basket.id));
-      
+
       console.log(`Successfully deleted basket: ${basket.basket_path}`);
     } catch (error) {
       console.error("Error deleting basket: ", error);
