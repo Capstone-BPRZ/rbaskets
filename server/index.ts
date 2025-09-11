@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../client/dist'))); // this serves the backend to the frontend on npm run build 
 app.use(cors());
 
-app.get('/', (_req: Request, res: Response) => {
+app.get('/api/health', (_req: Request, res: Response) => {
   res.send('Živeli!');
 });
 
