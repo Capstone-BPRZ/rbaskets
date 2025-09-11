@@ -42,6 +42,11 @@ async function getDBSecrets() {
   return secret;
 }
 
+getDBSecrets().then(console.log)
+// let psqlSecret = "unassigned";
+
+// getDBSecrets().then(result => psqlSecret = result ? result : 'secret lookup failed')
+
 async function connectSQL() {
   try {
     const client = new Client({

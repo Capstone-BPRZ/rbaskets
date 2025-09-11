@@ -11,6 +11,7 @@
     "secret": "ts-node-dev services/secret_test.ts",
     "lint": "eslint .",
     "start": "node build/index.js",
+    "build": "NODE_OPTIONS='--max-old-space-size=16384' npm run tsc",
     "tsc": "tsc",
     "test": "jest"
   },
