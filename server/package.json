@@ -8,8 +8,12 @@
   "main": "index.js",
   "scripts": {
     "dev": "ts-node-dev index.ts",
+    "slow-dev": "NODE_OPTIONS='--max-old-space-size=16384' npm run dev",
+    "secret": "ts-node-dev services/secret_test.ts",
+    "db_service": "ts-node-dev services/db_service.ts",
     "lint": "eslint .",
     "start": "node build/index.js",
+    "build": "NODE_OPTIONS='--max-old-space-size=16384' npm run tsc",
     "tsc": "tsc",
     "test": "jest"
   },
