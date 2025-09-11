@@ -8,6 +8,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "ts-node-dev index.ts",
+    "secret": "ts-node-dev services/secret_test.ts",
     "lint": "eslint .",
     "start": "node build/index.js",
     "tsc": "tsc",
