@@ -17,7 +17,9 @@ app.use(express.static(path.join(__dirname, '../client/dist'))); // this serves 
 app.use(cors());
 
 app.get('/api/health', (_req: Request, res: Response) => {
-  res.send('Živeli!');
+  res.status(200).json({
+    status: 'Živeli!'
+  });
 });
 
 app.all('/api/baskets/:basketPath/makeRequest', async (req: Request, res: Response) => { // decided to add the basketPath to the route as the requests coming in only pertain to a particular route.
