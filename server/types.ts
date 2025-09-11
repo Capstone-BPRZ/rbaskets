@@ -24,5 +24,8 @@ export interface BasketData {
 export type user_id = number;
 
 
-
+export interface RDSCredentials {
+    username: string;
+    password: string;
+}
 

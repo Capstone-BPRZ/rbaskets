@@ -1,6 +1,6 @@
 import { Client } from 'pg';
 import generatePath from './path_generator';
-import type { user_id, RequestDB, RequestData, BasketData, } from "../types.js";
+import type { user_id, RequestDB, RequestData, BasketData, RDSCredentials } from "../types.js";
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import {
@@ -18,7 +18,7 @@ const requestBodySchema = new mongoose.Schema({
 
 const RequestBody = mongoose.model('RequestBody', requestBodySchema)
 
-async function getDBSecrets() {
+async function getRDSSecrets() {
   const psqlSecretName = "w3d3/psql";
 
   const client = new SecretsManagerClient({
@@ -38,20 +38,20 @@ async function getDBSecrets() {
      throw error;
   }
 
-  const secret = response.SecretString;
-  return secret;
+  if (!response.SecretString) {
+    throw new Error("Database credentials not found");
+  }
+
+  return JSON.parse(response.SecretString) as RDSCredentials;
 }
-
-getDBSecrets().then(console.log)
-// let psqlSecret = "unassigned";
-
-// getDBSecrets().then(result => psqlSecret = result ? result : 'secret lookup failed')
 
 async function connectSQL() {
   try {
+    const rdsSecrets = await getRDSSecrets();
+
     const client = new Client({
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
+      user: rdsSecrets.username,
+      password: rdsSecrets.password,
       host: process.env.DB_HOST,
       port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 5432,
       database: process.env.DB_NAME
@@ -313,5 +313,4 @@ async function deleteBasket(basketPath: string): Promise<number | null> {
 export { selectRequest, selectAllRequests,
          selectBasket, selectAllBaskets,
          createBasket, addRequestToBasket, deleteBasket,
-         getDBSecrets,
          RequestBody };
