@@ -3,6 +3,10 @@ import generatePath from './path_generator';
 import type { user_id, RequestDB, RequestData, BasketData, } from "../types.js";
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import {
+  SecretsManagerClient,
+  GetSecretValueCommand,
+} from "@aws-sdk/client-secrets-manager";
 
 dotenv.config({ path: `${__dirname}/../.env` });
 
@@ -13,6 +17,30 @@ const requestBodySchema = new mongoose.Schema({
 });
 
 const RequestBody = mongoose.model('RequestBody', requestBodySchema)
+
+async function getDBSecrets() {
+  const psqlSecretName = "w3d3/psql";
+
+  const client = new SecretsManagerClient({
+    region: "us-east-1",
+  });
+
+  let response;
+
+  try {
+    response = await client.send(
+      new GetSecretValueCommand({
+        SecretId: psqlSecretName,
+        VersionStage: "AWSCURRENT", // VersionStage defaults to AWSCURRENT if unspecified
+      })
+    );
+  } catch (error) {
+     throw error;
+  }
+
+  const secret = response.SecretString;
+  return secret;
+}
 
 async function connectSQL() {
   try {
@@ -280,4 +308,5 @@ async function deleteBasket(basketPath: string): Promise<number | null> {
 export { selectRequest, selectAllRequests,
          selectBasket, selectAllBaskets,
          createBasket, addRequestToBasket, deleteBasket,
+         getDBSecrets,
          RequestBody };
